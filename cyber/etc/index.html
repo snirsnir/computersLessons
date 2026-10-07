@@ -91,8 +91,10 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
 .combo-list{font-family:var(--mono);font-size:.8rem;color:var(--muted);max-height:90px;overflow:auto;background:#010806;border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:10px}
 .cand-head{font-size:1.1rem;font-weight:700;margin-bottom:12px;color:var(--ink)}
 .cand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.cand{font-family:var(--mono);font-size:1.25rem;font-weight:700;padding:14px;border-radius:12px;background:#02110c;border:2px solid var(--line);color:var(--term);cursor:pointer;transition:.12s;letter-spacing:1px}
-.cand:hover{border-color:var(--term);transform:translateY(-2px)}
+.cand{font-family:var(--mono);font-size:1.3rem;font-weight:700;padding:14px;border-radius:12px;background:#02110c;border:2px solid var(--line);color:var(--term);letter-spacing:1px;user-select:all}
+.cand-try{display:flex;gap:8px;max-width:480px;margin:16px auto 0}
+.cand-try input{flex:1;font-family:var(--mono);font-size:1.3rem;padding:13px;border-radius:12px;background:#02110c;border:2px solid var(--term);color:var(--term);text-align:center}
+.cand-try input:focus{outline:none;box-shadow:0 0 0 3px rgba(0,255,136,.2)}
 .cand.wrong{border-color:var(--red);color:var(--red);text-decoration:line-through;opacity:.55;cursor:not-allowed}
 .cand.right{border-color:var(--term);background:var(--term);color:#021}
 .cand-note{color:var(--muted);font-size:.9rem;margin-top:10px}
@@ -147,7 +149,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
       <div class="boot" id="boot"></div>
       <div class="mission" id="missionBox" style="display:none">
         🎯 <b>המשימה שלכם, האקרים אתיים:</b><br>
-        1️⃣ לקרוא את תיק החקירה על <b>"מר שמוליק"</b> ולאסוף עליו מידע אישי.<br>
+        1️⃣ לקרוא את תיק החקירה על <b>"רוני"</b> ולאסוף עליה מידע אישי.<br>
         2️⃣ להזין את המידע ל<b>מחולל הסיסמאות</b>.<br>
         3️⃣ להריץ Brute Force ולפרוץ לחשבון שלו.<br>
         4️⃣ לגלות <b>איך מגינים</b> על עצמנו מהשיטה הזו!<br><br>
@@ -160,7 +162,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
   <!-- STORY -->
   <section class="screen" id="story">
     <div class="card">
-      <h2 class="term-title">📁 תיק חקירה #4471 — מטרה: "מר שמוליק"</h2>
+      <h2 class="term-title">📁 תיק חקירה #4471 — מטרה: "רוני"</h2>
       <p class="lead">סוכנים, אספנו מהרשתות החברתיות של המטרה את הפרופיל הבא. קראו אותו היטב — כל <span class="clue" title="רמז!">מילה מודגשת בצהוב</span> היא פרט שיכול להסתתר בסיסמה שלו.</p>
       <div class="folder-tab">PROFILE.txt</div>
       <div class="dossier" id="dossier"></div>
@@ -173,7 +175,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
   <section class="screen" id="clues">
     <div class="card">
       <h2 class="term-title">🧩 שלב 2 — איסוף מודיעין</h2>
-      <p class="lead">מלאו את הפרטים שגיליתם על מר שמוליק מתוך התיק. המחולל ישתמש בהם כדי לבנות ניחושים. (אל תדאגו לטעויות קטנות — אפשר לתקן.)</p>
+      <p class="lead">מלאו את הפרטים שגיליתם על רוני מתוך התיק. המחולל ישתמש בהם כדי לבנות ניחושים. (אל תדאגו לטעויות קטנות — אפשר לתקן.)</p>
       <div class="grid2" id="clueFields"></div>
       <div>
         <div style="font-weight:700;margin:16px 0 4px;color:#bfe9d4">מה להוסיף לכל מילה? (ככה האקרים מגדילים את מספר הניחושים)</div>
@@ -216,9 +218,13 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
         </div>
       </div>
       <div id="candPanel" style="display:none;margin-top:18px">
-        <div class="cand-head">🎯 נמצאו <b>6 סיסמאות אפשריות</b> — אבל רק <b>אחת</b> נכונה! נסו אותן עד שתפרצו:</div>
+        <div class="cand-head">🎯 נמצאו <b>6 סיסמאות אפשריות</b> — אבל רק <b>אחת</b> נכונה!</div>
         <div class="cand-grid" id="candGrid"></div>
-        <div class="cand-note">לוחצים על סיסמה כדי לנסות אותה (או מקלידים אותה בתיבה למעלה). כל פתיחה של האתר — הסיסמה הנכונה שונה! 🎲</div>
+        <div class="cand-try">
+          <input id="candInput" placeholder="הקלידו כאן סיסמה מהרשימה…" dir="ltr" autocomplete="off">
+          <button class="big-btn" id="candTryBtn">🔓 נסה לפרוץ</button>
+        </div>
+        <div class="cand-note">הקלידו בעצמכם כל סיסמה מהרשימה ובדקו אם היא עובדת. כל פתיחה של האתר — הסיסמה הנכונה שונה! 🎲</div>
       </div>
     </div>
   </section>
@@ -232,7 +238,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
       <div class="mono" id="foundMeta" style="color:var(--muted)"></div>
       <div class="lesson" style="text-align:right">
         🎯 <b>איך זה קרה כל כך מהר?</b><br>
-        הסיסמה של מר שמוליק הייתה בנויה מ<b>מידע אישי</b> שכולם יכולים למצוא עליו ברשת (שם חיית המחמד, שנת לידה, קבוצה אהודה…). המחשב צמצם תוך שניות ל<b>6 אפשרויות בלבד</b>, וכל מה שנשאר היה לנסות אותן עד שאחת עבדה. <br>
+        הסיסמה של רוני הייתה בנויה מ<b>מידע אישי</b> שכולם יכולים למצוא עליו ברשת (שם חיית המחמד, שנת לידה, קבוצה אהודה…). המחשב צמצם תוך שניות ל<b>6 אפשרויות בלבד</b>, וכל מה שנשאר היה לנסות אותן עד שאחת עבדה. <br>
         מחשב אמיתי יכול לנסות <b>מיליוני</b> ניחושים בשנייה אחת!
       </div>
       <div class="recipe" style="text-align:right">
@@ -249,7 +255,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
       <!-- ENCRYPTION SLOT -->
       <div class="locked" style="text-align:right;margin-top:20px">
         <div class="badge">🔐 שלב מוצפן — נעול</div>
-        <h3 class="term-title" style="margin-top:10px">רגע… מצאנו קובץ מוצפן בחשבון של מר שמוליק!</h3>
+        <h3 class="term-title" style="margin-top:10px">רגע… מצאנו קובץ מוצפן בחשבון של רוני!</h3>
         <p style="color:#bfe9d4;line-height:1.8">בתוך החשבון שפרצנו יש הודעה סודית, אבל היא <b>מוצפנת</b> — מעורבבת בקוד סודי שאי אפשר לקרוא. כדי לפענח אותה צריך ללמוד <b>הצפנות</b>.</p>
         <div class="enc" id="encPreview"></div>
         <div class="center" style="margin-top:16px">
@@ -313,7 +319,7 @@ function show(id){
 const BOOT=[
   ["[ OK ] אתחול מסוף יחידת הסייבר...","q"],
   ["[ OK ] טעינת כלי Brute Force v2.4","q"],
-  ["[ !! ] אותר יעד: מר שמוליק","w"],
+  ["[ !! ] אותר יעד: רוני","w"],
   ["[ .. ] סורק רשתות חברתיות של היעד...",""],
   ["[ OK ] נאסף מידע אישי זמין לכולם","q"],
   ["[ >> ] ממתין לפקודת האקר...","w"],
@@ -332,13 +338,13 @@ $("#toStory").onclick=()=>{beep([440,660]);show("story")};
 
 /* ===== story ===== */
 const STORY=[
-  ["היי! קוראים לי ", null],["שמוליק", "שם פרטי"],[" ואני בן ", null],["11", "גיל"],
-  [". נולדתי בשנת ", null],["2011", "שנת לידה"],[". אני גר ב", null],["חיפה", "עיר מגורים"],
-  [". הכי אוהב בעולם את הכלבה שלי, ", null],["לונה", "שם חיית מחמד 🐶"],
-  [" — היא הכי חמודה! בזמן הפנוי אני משחק ", null],["כדורסל", "תחביב"],
-  [" ואוהד את קבוצת ", null],["מכבי", "קבוצה אהודה"],
-  [". המאכל האהוב עליי הוא ", null],["פיצה", "מאכל אהוב"],
-  [". וזהו, זה אני!", null],
+  ["היי! קוראים לי ", null],["רוני", "שם פרטי"],[" ואני בת ", null],["10", "גיל"],
+  [". נולדתי בשנת ", null],["2014", "שנת לידה"],[". אני גרה ב", null],["תל אביב", "עיר מגורים"],
+  [". הכי אוהבת בעולם את החתול שלי, ", null],["מוקה", "שם חיית מחמד 🐱"],
+  [" — הוא הכי חמוד! בזמן הפנוי אני עושה ", null],["שחייה", "תחביב"],
+  [" ואוהדת את קבוצת ", null],["הפועל", "קבוצה אהודה"],
+  [". המאכל האהוב עליי הוא ", null],["סושי", "מאכל אהוב"],
+  [". וזהו, זו אני!", null],
 ];
 function buildStory(){
   const d=$("#dossier"); d.innerHTML="";
@@ -354,12 +360,12 @@ $("#toClues").onclick=()=>{beep([440,660]);show("clues");renderClues()};
 
 /* ===== clue fields ===== */
 const FIELDS=[
-  {k:"pet",label:"🐶 שם חיית המחמד",ex:"לדוגמה מהסיפור: לונה"},
-  {k:"name",label:"🙂 שם פרטי",ex:"שמוליק"},
-  {k:"year",label:"📅 שנת לידה",ex:"2011"},
-  {k:"hobby",label:"⚽ תחביב",ex:"כדורסל"},
-  {k:"city",label:"🏙️ עיר",ex:"חיפה"},
-  {k:"team",label:"🏀 קבוצה אהודה",ex:"מכבי"},
+  {k:"pet",label:"🐱 שם חיית המחמד",ex:"לדוגמה מהסיפור: מוקה"},
+  {k:"name",label:"🙂 שם פרטי",ex:"רוני"},
+  {k:"year",label:"📅 שנת לידה",ex:"2014"},
+  {k:"hobby",label:"🏊 תחביב",ex:"שחייה"},
+  {k:"city",label:"🏙️ עיר",ex:"תל אביב"},
+  {k:"team",label:"🏀 קבוצה אהודה",ex:"הפועל"},
 ];
 let rendered=false;
 function renderClues(){
@@ -381,7 +387,7 @@ $("#toCrack").onclick=()=>{
 const HEB={'א':'','ב':'b','ג':'g','ד':'d','ה':'h','ו':'o','ז':'z','ח':'ch','ט':'t','י':'i','כ':'k','ך':'k',
   'ל':'l','מ':'m','ם':'m','נ':'n','ן':'n','ס':'s','ע':'','פ':'p','ף':'f','צ':'ts','ץ':'ts','ק':'k','ר':'r','ש':'sh','ת':'t',
   ' ':'','-':'','"':'','\'':''};
-const MAP={'לונה':'luna','שמוליק':'shmulik','כדורסל':'basketball','חיפה':'haifa','מכבי':'maccabi','פיצה':'pizza',
+const MAP={'לונה':'luna','שמוליק':'shmulik','מוקה':'mocha','רוני':'roni','כדורסל':'basketball','שחייה':'swimming','חיפה':'haifa','תל אביב':'telaviv','מכבי':'maccabi','הפועל':'hapoel','פיצה':'pizza','סושי':'sushi',
   'כדורגל':'football','תל אביב':'telaviv','ירושלים':'jerusalem'};
 function translit(s){
   s=s.trim(); if(MAP[s])return MAP[s];
@@ -422,6 +428,8 @@ let crackState;
 function setupCrack(){
   crackState={running:false,idx:0,done:false,found:false,delay:70,scanTotal:Math.min(Math.max(COMBOS.length,24),60)};
   $("#candPanel").style.display="none"; $("#candGrid").innerHTML="";
+  {const mb=document.querySelector(".manual"); if(mb)mb.style.display="flex";}
+  {const ci=$("#candInput"); if(ci)ci.value="";}
   $("#comboCount").textContent=COMBOS.length;
   $("#comboN").textContent=COMBOS.length; $("#triedN").textContent=0;
   $("#bar").style.width="0"; $("#progTxt").textContent="מוכן להפעלה"; $("#speedTxt").textContent="";
@@ -455,17 +463,12 @@ $("#runBtn").onclick=()=>{
 $("#turboBtn").onclick=()=>{crackState.delay=crackState.delay<30?70:12;toast(crackState.delay<30?"מצב מהיר ⏩":"מהירות רגילה")};
 $("#manualBtn").onclick=tryManual;
 $("#manualPw").addEventListener("keydown",e=>{if(e.key==="Enter")tryManual()});
-function tryManual(){
-  const v=($("#manualPw").value||"").trim().toLowerCase(); if(!v)return;
-  if(!crackState||!crackState.done){toast("קודם הפעילו את ה־Brute Force ⚡");return;}
-  if(crackState.found)return;
-  if(v===CANDIDATES[correctIdx].toLowerCase()){const i=correctIdx;crackState.found=true;markCand(i,true);sHit();finishCrack(CANDIDATES[i]);}
-  else if(CANDIDATES.some(c=>c.toLowerCase()===v)){const i=CANDIDATES.findIndex(c=>c.toLowerCase()===v);markCand(i,false);sBad();toast("❌ זו אחת מהאפשרויות — אבל לא הנכונה!");$("#manualPw").value="";}
-  else{sBad();toast("❌ לא ברשימה. נסו אחת מ־6 הסיסמאות!");$("#manualPw").value="";}
-}
+$("#candTryBtn").onclick=()=>tryPassword($("#candInput").value);
+$("#candInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryPassword($("#candInput").value)});
+function tryManual(){ tryPassword($("#manualPw").value); $("#manualPw").value=""; }
 function finishCrack(pw){
   $("#foundPw").textContent=pw;
-  $("#foundMeta").textContent="אחת מ־6 הסיסמאות שהמחשב בנה מהמידע האישי של מר שמוליק";
+  $("#foundMeta").textContent="אחת מ־6 הסיסמאות שהמחשב בנה מהמידע האישי של רוני";
   setTimeout(()=>{show("done"); buildEnc();},700);
 }
 function buildCandidates(){
@@ -489,9 +492,21 @@ function buildCandidates(){
 }
 function revealCandidates(){
   const grid=$("#candGrid"); grid.innerHTML="";
-  CANDIDATES.forEach((c,i)=>{const b=document.createElement("button");b.className="cand";b.textContent=c;b.onclick=()=>tryCandidate(i);grid.appendChild(b);});
+  CANDIDATES.forEach((c)=>{const d=document.createElement("div");d.className="cand";d.textContent=c;grid.appendChild(d);});
+  const mb=document.querySelector(".manual"); if(mb)mb.style.display="none";
   $("#candPanel").style.display="block"; sHit();
+  setTimeout(()=>{const ci=$("#candInput"); if(ci)ci.focus();},200);
   $("#candPanel").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function tryPassword(raw){
+  if(!crackState||!crackState.done){toast("קודם הפעילו את ה־Brute Force ⚡");return;}
+  if(crackState.found)return;
+  const v=(raw||"").trim().toLowerCase(); if(!v)return;
+  const i=CANDIDATES.findIndex(c=>c.toLowerCase()===v);
+  if(v===CANDIDATES[correctIdx].toLowerCase()){crackState.found=true;markCand(correctIdx,true);sHit();finishCrack(CANDIDATES[correctIdx]);}
+  else if(i>=0){markCand(i,false);sBad();toast("❌ זו אחת מהאפשרויות — אבל לא הנכונה!");}
+  else{sBad();toast("❌ לא ברשימה. העתיקו בדיוק אחת מ־6 הסיסמאות!");}
+  const ci=$("#candInput"); if(ci)ci.value="";
 }
 function markCand(i,ok){const b=$("#candGrid").children[i]; if(b){b.classList.add(ok?"right":"wrong"); if(!ok)b.disabled=true;}}
 function tryCandidate(i){

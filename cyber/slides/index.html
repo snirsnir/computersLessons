@@ -70,6 +70,15 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
 .ing{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 18px}
 /* cipher wheel */
 .wheelwrap{position:relative;width:min(62vw,350px);height:min(62vw,350px)}
+.mirror{display:inline-block;transform:scaleX(-1)}
+.puzzle-word{display:inline-block;font-family:var(--mono);font-size:clamp(2.4rem,12vw,5.5rem);font-weight:900;color:var(--gold);letter-spacing:12px;background:rgba(255,255,255,.06);border:2px dashed rgba(255,255,255,.22);border-radius:20px;padding:16px 30px;margin:12px}
+.method-badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 22px;font-weight:900;font-size:clamp(1.05rem,3.2vw,1.7rem)}
+.sym-legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:14px 0}
+.sym-legend .p{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:8px 14px;min-width:60px}
+.sym-legend .p .s{font-size:clamp(1.8rem,5vw,2.4rem)}
+.sym-legend .p .l{font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--gold)}
+.try-prompt{font-size:clamp(1.3rem,4vw,2.2rem);font-weight:900;color:var(--green)}
+.mirror-note{color:var(--muted);font-size:clamp(.95rem,2.6vw,1.3rem)}
 .ring{position:absolute;inset:0;border-radius:50%}
 .ring .l{position:absolute;left:50%;top:50%;font-weight:900;font-size:clamp(.8rem,2.6vw,1.3rem);transform-origin:0 0}
 .ring.outer .l{color:var(--p2)} .ring.inner .l{color:var(--gold)}
@@ -246,40 +255,65 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
   </section>
 
   <section class="slide" data-sec="הצפנות 🔐">
-    <h2>מה זו הצפנה? 🤫</h2>
-    <p class="step">מחליפים כל אות באות אחרת, כדי שרק מי שיודע את ה<b>מפתח</b> יוכל לקרוא.</p>
-    <div class="row step" style="margin-top:20px;font-size:clamp(1.3rem,4vw,2.4rem);font-weight:900">
-      <span class="mono">שלום</span><span>🔒➡️</span><span class="mono" style="color:var(--gold)">בכפי</span>
-    </div>
-    <p class="step" style="margin-top:16px">גם ווטסאפ, הבנק והצבא מצפינים ככה את המידע! 🏦</p>
-  </section>
-
-  <section class="slide" data-sec="הצפנות 🔐">
-    <h2>גלגל ההצפנה 🎡</h2>
-    <p class="step" style="max-width:30ch">מזיזים את הגלגל, וכל אות הופכת לאות אחרת. ה<b>מספר</b> שהזזנו הוא המפתח!</p>
-    <div class="wheelwrap step float" id="wheelwrap">
-      <div class="ring outer" id="ringOuter"></div>
-      <div class="ring inner" id="ringInner"></div>
-      <div class="wheel-center">🎡</div>
-    </div>
-    <div class="step row" style="margin-top:10px">
-      <span>הזזה:</span><input type="range" min="0" max="21" value="3" class="slider" id="wheelKey"><span class="mono" id="wheelKeyVal" style="color:var(--gold);font-size:1.6rem">3</span>
-    </div>
-  </section>
-
-  <section class="slide" data-sec="הצפנות 🔐">
-    <h2>פענחו יחד! 🔍</h2>
-    <p style="color:var(--muted)">ההודעה הוצפנה בהזזה של 3. גלו מה כתוב!</p>
-    <div class="mono" style="font-size:clamp(1.6rem,6vw,3.2rem);color:var(--gold);letter-spacing:4px;margin:10px">ñ</div>
-    <div class="decode-box" id="decodeBox"></div>
-    <div class="step"><button class="tapbtn gold" id="decodeBtn">פענח! 🔓</button></div>
+    <div class="big-emo step">🎨🪞</div>
+    <h2>מה זו הצפנה?</h2>
+    <p class="step">הצייר <b>לאונרדו דה וינצ׳י</b> כתב את סודותיו ב<b>כתב ראי</b> — הפוך! אפשר לקרוא רק מול מראה 🪞</p>
+    <div class="step"><span class="puzzle-word mirror">סוד</span></div>
+    <p class="step"><b>הצפנה</b> = הופכים הודעה לקוד סודי שרק מי שמכיר את השיטה קורא.</p>
   </section>
 
   <section class="slide" data-sec="הצפנות 🔐">
     <div class="big-emo step">🔑</div>
-    <h2 class="step">זכרו את המפתח!</h2>
-    <p class="step">את ה<b>מפתח</b> (השיטה + המספר) שולחים <b>בנפרד</b> מההודעה.</p>
-    <p class="step" style="color:var(--gold);font-weight:700">אחרת זה כמו לנעול דלת… ולהדביק עליה את המפתח! 😅</p>
+    <h2>מה זה מפתח?</h2>
+    <p class="step">ה<b>מפתח</b> הוא ה<b>סוד</b> שצריך כדי לפענח את ההודעה.</p>
+    <p class="step">אצל דה וינצ׳י המפתח היה פשוט: <b>"תסתכלו במראה!"</b> 🪞</p>
+    <p class="step" style="color:var(--gold);font-weight:700">בלי המפתח — ההודעה נשארת בלגן של אותיות. 🔒</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>🔍 פענחו לבד! — 1</h2>
+    <div class="method-badge">כתב ראי 🪞</div>
+    <div><span class="puzzle-word mirror">כיף</span></div>
+    <p class="try-prompt step">מה כתוב? 🤔</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>🔍 פענחו לבד! — 2</h2>
+    <div class="method-badge">טקסט הפוך 🔄 (קוראים מהסוף)</div>
+    <div><span class="puzzle-word">בלכ</span></div>
+    <p class="try-prompt step">מה כתוב? 🤔</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>🔍 פענחו לבד! — 3</h2>
+    <div class="method-badge">סמלים 🔣</div>
+    <div class="sym-legend">
+      <div class="p"><div class="s">⭐</div><div class="l">ש</div></div>
+      <div class="p"><div class="s">🌙</div><div class="l">מ</div></div>
+    </div>
+    <div><span class="puzzle-word">⭐🌙⭐</span></div>
+    <p class="try-prompt step">מה כתוב? 🤔</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>🔍 פענחו לבד! — 4</h2>
+    <div class="method-badge">כתב ראי 🪞</div>
+    <div><span class="puzzle-word mirror">בית</span></div>
+    <p class="try-prompt step">מה כתוב? 🤔</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>🔍 פענחו לבד! — 5</h2>
+    <div class="method-badge">טקסט הפוך 🔄</div>
+    <div><span class="puzzle-word">הדות</span></div>
+    <p class="try-prompt step">מה כתוב? 🤔</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <div class="big-emo float">🔑</div>
+    <h2>זכרו את המפתח!</h2>
+    <p class="step">את ה<b>מפתח</b> (השיטה הסודית) שומרים <b>בסוד</b> ומספרים רק למי שמותר.</p>
+    <p class="step" style="color:var(--gold);font-weight:700">כי מי שיש לו את המפתח — יכול לקרוא הכול! 🔓</p>
   </section>
 
   <!-- ===== CLOSING ===== -->
@@ -325,8 +359,6 @@ function renderSlide(i,revealAll){
   renderDots();
   setBg(i);
   if(i===idxCounter) resetCounter();
-  if(i===idxWheel) buildWheel();
-  if(i===idxDecode) resetDecode();
   $("#hintTap").style.display= i===slides.length-1 ? "none":"block";
 }
 function next(){
@@ -388,7 +420,7 @@ document.addEventListener("keydown",e=>{
   else if(e.key==="Home"){cur=0;renderSlide(0,false)}
   else if(e.key==="f"||e.key==="F"){toggleFs()}
 });
-$(".stage").addEventListener("click",e=>{if(e.target.closest("button,input,.slider,#wheelwrap"))return;next()});
+$(".stage").addEventListener("click",e=>{if(e.target.closest("button,input"))return;next()});
 function toggleFs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen()}
 $("#fsBtn").onclick=e=>{e.stopPropagation();toggleFs()};
 
@@ -408,33 +440,6 @@ $("#counterBtn")&&($("#counterBtn").onclick=e=>{e.stopPropagation();if(counterRa
   const el=$("#counter");const target=1e9;const t0=performance.now();const dur=2200;
   (function a(t){const p=Math.min((t-t0)/dur,1);const v=Math.floor(target*(p*p));
     el.textContent=v.toLocaleString("en-US");if(p<1)requestAnimationFrame(a);else{el.textContent="1,000,000,000";sWin()}})(t0)});
-
-/* ----- cipher wheel ----- */
-const ALEF=["א","ב","ג","ד","ה","ו","ז","ח","ט","י","כ","ל","מ","נ","ס","ע","פ","צ","ק","ר","ש","ת"];
-const idxWheel=slides.findIndex(s=>s.querySelector("#wheelwrap"));
-let wheelBuilt=false;
-function placeRing(ring,letters,radius){
-  ring.innerHTML="";const n=letters.length;
-  letters.forEach((l,k)=>{const a=(k/n)*2*Math.PI-Math.PI/2;const el=document.createElement("div");el.className="l";el.textContent=l;
-    el.style.transform=`translate(${Math.cos(a)*radius}px,${Math.sin(a)*radius}px) rotate(${a+Math.PI/2}rad)`;ring.appendChild(el)})}
-function buildWheel(){const R=$("#wheelwrap").clientWidth/2;
-  placeRing($("#ringOuter"),ALEF,R*.86);placeRing($("#ringInner"),ALEF,R*.6);
-  wheelBuilt=true;spinWheel(+$("#wheelKey").value)}
-function spinWheel(k){$("#ringInner").style.transform=`rotate(${k/22*360}deg)`;$("#wheelKeyVal").textContent=k}
-$("#wheelKey")&&($("#wheelKey").oninput=e=>{spinWheel(+e.target.value);beep(400+(+e.target.value)*20,.03)});
-
-/* ----- decode demo (shift 3: encrypted of a word) ----- */
-const idxDecode=slides.findIndex(s=>s.querySelector("#decodeBox"));
-const PLAIN="מחשב";
-function encShift(s,k){return [...s].map(c=>{const i=ALEF.indexOf(c);return i<0?c:ALEF[(i+k)%22]}).join("")}
-const CIPHER=encShift(PLAIN,3);
-function resetDecode(){const box=$("#decodeBox");box.innerHTML=[...CIPHER].map(c=>`<span class="c">${c}</span>`).join("");
-  $("#decodeBox").dataset.done="0";
-  // show cipher in the header line above
-  const hdr=slides[idxDecode].querySelector(".mono");if(hdr)hdr.textContent=CIPHER}
-$("#decodeBtn")&&($("#decodeBtn").onclick=e=>{e.stopPropagation();if($("#decodeBox").dataset.done==="1")return;$("#decodeBox").dataset.done="1";
-  const cs=$$("#decodeBox .c");cs.forEach((el,k)=>setTimeout(()=>{el.textContent=PLAIN[k];el.classList.add("done");beep(500+k*80,.1);
-    if(k===cs.length-1){sWin();confetti(100)}},k*450))});
 
 $("#finishBtn")&&($("#finishBtn").onclick=e=>{e.stopPropagation();sWin();confetti(240)});
 
