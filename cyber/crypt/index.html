@@ -81,11 +81,11 @@ h2{font-size:clamp(1.4rem,4.5vw,2.2rem);font-weight:900;margin:.1em 0}
 
   <section class="screen active" id="intro">
     <div class="card">
-      <div class="hdr-ico">🕵️‍♀️🔓</div>
-      <h1 class="grad">פענחו את ההודעות הסודיות!</h1>
-      <p class="lead"><b>הצפנה</b> היא שפה סודית: כל אות מתחלפת באות או בסמל אחר. יש לכם <b>מקרא</b> (מפתח) שיעזור לפענח.</p>
-      <p class="lead">לפניכם <b>6 הודעות</b> מוצפנות, כל אחת בשיטה אחרת. בהצלחה, סוכנים! 🔎</p>
-      <button class="big-btn" id="startBtn">מתחילים 🚀</button>
+      <div class="hdr-ico">🏴‍☠️🗺️</div>
+      <h1 class="grad">מצוד האוצר המוצפן</h1>
+      <p class="lead">הפיראט הזקן <b>קפטן קוד</b> החביא אוצר, והשאיר בדרך אליו <b>6 הודעות מוצפנות</b>. 🏴‍☠️</p>
+      <p class="lead">פענחו את כולן! כל הודעה ב<b>שיטה אחרת</b>, ולכל אחת יש <b>מקרא</b> (מפתח) שיעזור לכם.</p>
+      <button class="big-btn" id="startBtn">יוצאים למסע 🗺️</button>
     </div>
   </section>
 
@@ -117,7 +117,7 @@ h2{font-size:clamp(1.4rem,4.5vw,2.2rem);font-weight:900;margin:.1em 0}
       <div class="hdr-ico">🏅</div>
       <h1 class="grad">כל הכבוד, מפענח/ת צפנים!</h1>
       <div class="stars" id="stars">⭐⭐⭐</div>
-      <p class="lead">פענחתם את כל 6 ההודעות הסודיות! עכשיו אתם יודעים איך עובדת הצפנה.</p>
+      <p class="lead">פענחתם את כל 6 ההודעות ומצאתם את האוצר! 🏴‍☠️💰 עכשיו אתם יודעים איך עובדת הצפנה.</p>
       <div id="scoreLine" class="lead" style="color:var(--gold);font-weight:700"></div>
       <button class="ghost-btn" id="againBtn">🔄 לשחק שוב</button>
     </div>
@@ -133,12 +133,12 @@ const N=22, idx=l=>ALEF.indexOf(FINAL[l]||l);
 const SYMBOLS=["⭐","🌙","☁️","⚡","❄️","🔥","💧","🌈","🍎","🍌","🍕","🎈","🎁","🎸","⚽","🚗","✈️","🐶","🐱","🐠","🌵","🍄"];
 
 const QS=[
-  {type:"fwd", k:1, word:"חבר",  tag:"אות קדימה ➡️", rule:"כל אות הוזזה אות אחת קדימה באלפבית. חפשו במקרא כל אות סודית וקראו את האות האמיתית."},
-  {type:"back",k:1, word:"שמש",  tag:"אות אחורה ⬅️", rule:"כל אות הוזזה אות אחת אחורה באלפבית. היעזרו במקרא."},
-  {type:"fwd", k:2, word:"כלב",  tag:"אות קדימה (2) ➡️➡️", rule:"הפעם כל אות הוזזה שתי אותיות קדימה. היעזרו במקרא."},
+  {type:"fwd", k:1, word:"חבר",  tag:"אות קדימה ➡️", rule:"כל אות הוזזה אות אחת קדימה. חפשו במקרא כל אות סודית וקראו את האות האמיתית שמתחת."},
+  {type:"back",k:1, word:"שמש",  tag:"אות אחורה ⬅️", rule:"כל אות הוזזה אות אחת אחורה. היעזרו במקרא."},
   {type:"reverse", word:"בית",   tag:"טקסט הפוך 🔄", rule:"אין כאן החלפת אותיות — פשוט קראו את המילה מהסוף להתחלה!"},
-  {type:"back",k:3, word:"מים",  tag:"אות אחורה (3) ⬅️⬅️⬅️", rule:"כל אות הוזזה שלוש אותיות אחורה. היעזרו במקרא."},
   {type:"symbols", word:"חתול",  tag:"סמלים 🔣", rule:"כל אות הוחלפה בסמל. במקרא כל סמל עם האות שלו — פענחו!"},
+  {type:"gematria", word:"אור",  tag:"מספרים 🔢", rule:"כל אות הפכה למספר: א=1, ב=2, ג=3… במקרא כל מספר עם האות שלו."},
+  {type:"fwd", k:2, word:"כלב",  tag:"אות קדימה (2) ➡️➡️", rule:"הפעם כל אות הוזזה שתי אותיות קדימה. היעזרו במקרא."},
 ];
 let cur=0, score=0, solvedThis=false;
 
@@ -146,6 +146,7 @@ function enc1(l,type,k){const i=idx(l);if(i<0)return l;
   if(type==="fwd")return ALEF[(i+k)%N];
   if(type==="back")return ALEF[(i-k+N*2)%N];
   if(type==="symbols")return SYMBOLS[i];
+  if(type==="gematria")return String(i+1);
   return l}
 function encWord(q){
   if(q.type==="reverse")return [...q.word].reverse().join("");
@@ -185,9 +186,10 @@ function render(){
       pairs.push({sym:enc1(ch,q.type,q.k),let:ALEF[r]})});
     lg.innerHTML=pairs.map(p=>`<div class="pair"><div class="sym">${p.sym}</div><div class="arr">▼</div><div class="let">${p.let}</div></div>`).join("");
   }
-  const enc=encWord(q);
-  $("#msg").className="msg"+(q.type==="symbols"?" sym":"");
-  $("#msg").textContent = q.type==="symbols" ? [...enc].join(" ") : enc;
+  if(q.type==="symbols"||q.type==="gematria"){
+    const parts=[...q.word].map(c=>enc1(c,q.type,q.k));
+    $("#msg").className="msg sym"; $("#msg").textContent=parts.join("  ");
+  }else{ $("#msg").className="msg"; $("#msg").textContent=encWord(q); }
   $("#answer").value="";$("#result").textContent="";$("#nextBtn").style.display="none";
   setTimeout(()=>$("#answer").focus(),100);
 }
@@ -204,7 +206,8 @@ function check(){
 }
 $("#checkBtn").onclick=check;
 $("#answer").addEventListener("keydown",e=>{if(e.key==="Enter")check()});
-$("#hintBtn").onclick=()=>{toast("💡 האות הראשונה היא: "+QS[cur].word[0])};
+const HINTS={fwd:"חפשו כל אות סודית במקרא וקראו את האות שמתחת 👇",back:"חפשו כל אות סודית במקרא וקראו את האות שמתחת 👇",reverse:"קראו את המילה מהסוף להתחלה 🔄",symbols:"כל סמל במקרא שווה לאות שמתחתיו 🔣",gematria:"כל מספר במקרא שווה לאות שמתחתיו 🔢"};
+$("#hintBtn").onclick=()=>{toast("💡 "+HINTS[QS[cur].type])};
 $("#nextBtn").onclick=()=>{sTick();if(cur<QS.length-1){cur++;render()}else finish()};
 function finish(){
   show("finish");sWin();confetti(240);

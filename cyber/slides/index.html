@@ -207,10 +207,10 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
 
   <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
     <h2>איך האקר מנחש סיסמה? 🤔</h2>
-    <p class="step">הוא לא "חושב"… הוא פשוט <b>מנסה הכול</b> — מהר מאוד!</p>
-    <div class="step counter" id="counter">0</div>
-    <p class="step"><b>ניחושים בשנייה אחת!</b> ⚡</p>
-    <div class="step"><button class="tapbtn" id="counterBtn">כמה מהר? ⚡</button></div>
+    <p>הוא לא "חושב"… הוא פשוט <b>מנסה הכול</b> — מהר מאוד!</p>
+    <div class="counter" id="counter">0</div>
+    <p style="font-size:clamp(1.2rem,3.5vw,2rem)"><b>ניחושים בשנייה אחת!</b> ⚡</p>
+    <p class="step" style="color:var(--gold);font-weight:700">מחשב אמיתי מנחש <b>מיליארד</b> סיסמאות בשנייה! 🤯</p>
   </section>
 
   <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
@@ -434,12 +434,16 @@ $("#castBtn")&&($("#castBtn").onclick=e=>{e.stopPropagation();
 
 /* ----- counter ----- */
 const idxCounter=slides.findIndex(s=>s.querySelector("#counter"));
-let counterRan=false;
-function resetCounter(){$("#counter").textContent="0";counterRan=false}
-$("#counterBtn")&&($("#counterBtn").onclick=e=>{e.stopPropagation();if(counterRan)return;counterRan=true;
-  const el=$("#counter");const target=1e9;const t0=performance.now();const dur=2200;
-  (function a(t){const p=Math.min((t-t0)/dur,1);const v=Math.floor(target*(p*p));
-    el.textContent=v.toLocaleString("en-US");if(p<1)requestAnimationFrame(a);else{el.textContent="1,000,000,000";sWin()}})(t0)});
+let counterTimer=null;
+function resetCounter(){
+  const el=$("#counter"); if(!el)return; el.textContent="0";
+  clearTimeout(counterTimer);
+  counterTimer=setTimeout(()=>{
+    const target=1e9,t0=performance.now(),dur=2500;
+    (function a(t){const p=Math.min((t-t0)/dur,1);el.textContent=Math.floor(target*(p*p)).toLocaleString("en-US");
+      if(p<1)requestAnimationFrame(a);else{el.textContent="1,000,000,000";sWin()}})(t0);
+  },500);
+}
 
 $("#finishBtn")&&($("#finishBtn").onclick=e=>{e.stopPropagation();sWin();confetti(240)});
 

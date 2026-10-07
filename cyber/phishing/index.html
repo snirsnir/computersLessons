@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ציד הדייגים – פישינג</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#06182a; --bg1:#0a2e4a; --card:#0e2d47; --card2:#0b2238; --line:#1d4a6e;
+  --ink:#eaf6ff; --muted:#8fb4cf; --c1:#19b3c6; --c2:#2bd4e8; --gold:#ffcf3f; --good:#2bff9b; --bad:#ff6b81;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{font-family:"Rubik",system-ui,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 15% 0,#0f5a6e 0,transparent 45%),radial-gradient(circle at 90% 100%,#0a3a6e 0,transparent 45%),linear-gradient(160deg,var(--bg0),var(--bg1));
+  background-attachment:fixed;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.04) 0 1px,transparent 1px 22px)}
+button{font-family:inherit;cursor:pointer}
+.wrap{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:16px 16px 60px}
+.topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:12px 16px;margin-bottom:16px;background:rgba(6,24,42,.85);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px}
+.brand{font-weight:900;color:var(--c2)}
+.score{background:rgba(255,255,255,.1);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-weight:800;white-space:nowrap}
+.icon-btn{background:rgba(25,179,198,.18);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:36px;font-size:1rem}
+.screen{display:none;animation:fade .4s ease}.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:24px;text-align:center}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:900;margin:.1em 0}
+h2{font-size:clamp(1.3rem,4.2vw,2rem);font-weight:900;margin:.1em 0;line-height:1.3}
+.grad{background:linear-gradient(90deg,var(--c2),var(--c1),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:1.15rem;line-height:1.7;color:#cfe8f7;max-width:42ch;margin:10px auto}
+.big-btn{background:linear-gradient(135deg,var(--c1),var(--c2));color:#042;border:0;border-radius:14px;padding:15px 34px;font-size:1.2rem;font-weight:900;box-shadow:0 6px 18px rgba(25,179,198,.4);transition:transform .1s}
+.big-btn:active{transform:translateY(3px)}
+.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:11px 22px;font-weight:700}
+.hdr-ico{font-size:3rem}
+.float{animation:float 3s ease-in-out infinite}@keyframes float{50%{transform:translateY(-10px)}}
+.dots{display:flex;gap:8px;justify-content:center;margin:4px 0 14px}
+.dots .d{width:13px;height:13px;border-radius:50%;background:var(--line)}
+.dots .d.on{background:var(--gold);transform:scale(1.25)}.dots .d.done{background:var(--good)}
+.qnum{color:var(--muted);font-weight:700}
+.bubble{position:relative;background:#fff;color:#14202b;border-radius:16px;padding:16px 20px;max-width:440px;margin:14px auto;
+  text-align:right;font-size:clamp(1.05rem,3vw,1.4rem);line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.bubble.sms::before{content:"📩 הודעה שהתקבלה";position:absolute;top:-12px;right:16px;background:var(--c1);color:#042;font-size:.8rem;font-weight:800;padding:3px 12px;border-radius:999px}
+.qtext{font-size:clamp(1.2rem,3.6vw,1.8rem);font-weight:800;margin:6px auto 4px;max-width:34ch}
+.opts{display:grid;gap:12px;margin-top:16px}
+.opt{background:#0b2238;border:2px solid var(--line);border-radius:14px;padding:15px 18px;font-size:clamp(1.02rem,3vw,1.35rem);font-weight:700;color:var(--ink);text-align:center;transition:.12s}
+.opt:hover{border-color:var(--c2);transform:translateY(-2px)}
+.opt.right{border-color:var(--good);background:rgba(43,255,155,.14)}
+.opt.wrong{border-color:var(--bad);background:rgba(255,107,129,.14);animation:shake .4s}
+@keyframes shake{25%,75%{transform:translateX(-6px)}50%{transform:translateX(6px)}}
+.opt:disabled{cursor:default}
+.explain{min-height:40px;margin-top:16px;font-size:1.08rem;line-height:1.6;font-weight:600}
+.badge-win{border:6px double var(--gold);border-radius:22px;padding:30px;background:linear-gradient(180deg,#0e2d47,#0b2238)}
+.stars{font-size:3rem;letter-spacing:6px;margin:8px 0}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:150}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) scale(.85);background:#0e2d47;border:1px solid var(--c2);color:var(--ink);font-weight:700;padding:12px 24px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.tips{text-align:right;max-width:460px;margin:10px auto}
+.tip{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:10px;font-size:1.05rem;font-weight:600}
+.tip .e{font-size:1.6rem}
+@media (max-width:600px){.card{padding:18px}}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">🎣 ציד הדייגים</div>
+    <div class="score">⭐ <span id="score">0</span></div>
+    <button class="icon-btn" id="soundBtn" title="צליל">🔊</button>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active" id="intro">
+    <div class="card">
+      <div class="hdr-ico float">🎣🐟</div>
+      <h1 class="grad">מה זה פישינג?</h1>
+      <p class="lead"><b>פישינג</b> (בעברית: <b>דיג</b>) זו הונאה ברשת. ההאקר זורק <b>פיתיון</b> מפתה — "זכית בפרס!" או "החשבון שלך ייחסם!" — ומחכה שמישהו "יינעל על הקרס" וייתן לו מידע אישי. 🪝</p>
+      <div class="tips">
+        <div class="tip"><span class="e">🎁</span> פיתיון מפתה מדי ("זכית!")</div>
+        <div class="tip"><span class="e">🏃</span> לחץ ודחיפות ("רק עכשיו!")</div>
+        <div class="tip"><span class="e">🔑</span> בקשה לסודות (סיסמה, קוד)</div>
+      </div>
+      <p class="lead"><b>המשימה:</b> 6 שאלות קצרות — תהפכו לציידי הונאות! 🕵️</p>
+      <button class="big-btn" id="startBtn">מתחילים 🚀</button>
+    </div>
+  </section>
+
+  <!-- QUESTION -->
+  <section class="screen" id="q">
+    <div class="card">
+      <div class="dots" id="dots"></div>
+      <div class="qnum" id="qnum"></div>
+      <div id="qbubble"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div class="explain" id="explain"></div>
+      <button class="big-btn" id="nextBtn" style="display:none">הבא ←</button>
+    </div>
+  </section>
+
+  <!-- FINISH -->
+  <section class="screen" id="finish">
+    <div class="card badge-win">
+      <div class="hdr-ico">🏅</div>
+      <h1 class="grad">כל הכבוד, צייד/ת הונאות!</h1>
+      <div class="stars" id="stars">⭐⭐⭐</div>
+      <div class="lead" id="scoreLine" style="color:var(--gold);font-weight:700"></div>
+      <div class="tips" style="margin-top:12px">
+        <div class="tip"><span class="e">🛑</span> הכלל הכי חשוב: <b>עוצרים · חושבים · שואלים מבוגר</b></div>
+        <div class="tip"><span class="e">🔑</span> אף פעם לא מוסרים סיסמה או קוד — לאף אחד!</div>
+      </div>
+      <button class="ghost-btn" id="againBtn">🔄 לשחק שוב</button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const QS=[
+  {q:"מה זה פישינג (דיג)?",
+   opts:["סוג של דגים באינטרנט","הונאה שמנסה לגנוב ממך מידע אישי","משחק מחשב פופולרי"],correct:1,
+   ex:"נכון! פישינג = הונאה שמנסה 'לדוג' מאיתנו מידע אישי."},
+  {bubble:"🎁 מזל טוב!! זכית ב-1,000 ₪! רק היום — לחץ כאן ומלא את הפרטים שלך 👉",
+   q:"ההודעה הזאת היא…",opts:["פישינג 🎣","הודעה בטוחה ✅"],correct:0,
+   ex:"פישינג! פרס מפתה + לחץ של זמן + בקשת פרטים = סימני אזהרה קלאסיים."},
+  {bubble:"היי, נתראה מחר בשיעור מחשבים 😊",
+   q:"וההודעה הזאת?",opts:["פישינג 🎣","הודעה בטוחה ✅"],correct:1,
+   ex:"בטוחה! הודעה רגילה מחבר, בלי פרסים, בלי לחץ ובלי בקשת סודות."},
+  {q:"קיבלת הודעה: \"החשבון שלך ייחסם תוך שעה! לחץ מיד\". מה עושים?",
+   opts:["ממלאים מהר לפני שייחסם","עוצרים, חושבים ושואלים מבוגר","שולחים לכל החברים"],correct:1,
+   ex:"עוצרים, חושבים ושואלים מבוגר. לחץ ואיום = סימן מובהק להונאה."},
+  {bubble:"היי, זה הדוד 🙂 תשלח לי מהר את הקוד שקיבלת עכשיו ב-SMS",
+   q:"מה עושים?",opts:["שולחים מהר, זה הדוד","לא שולחים קוד אף פעם, ומתקשרים לבדוק"],correct:1,
+   ex:"אף פעם לא מוסרים קוד! גם אם זה 'נראה' מוכר — מתקשרים ובודקים ישירות."},
+  {q:"מה הכי בטוח לעשות עם סיסמה?",
+   opts:["לשתף עם חבר טוב","לכתוב אותה על המחשב","לא לספר אותה לאף אחד"],correct:2,
+   ex:"סיסמה היא סוד אישי — לא משתפים אותה עם אף אחד, גם לא עם חבר טוב."},
+];
+let cur=0, score=0, answered=false;
+
+let actx,sound=true;
+function beep(f,dur=.1,type="sine",vol=.13){if(!sound)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  f.forEach((x,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=x;o.connect(g);g.connect(actx.destination);
+  const t=actx.currentTime+i*dur;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)})}catch(e){}}
+const sGood=()=>beep([660,880,1046],.12),sBad=()=>beep([200,160],.14,"sawtooth"),sWin=()=>beep([523,659,784,1046],.13);
+$("#soundBtn").onclick=()=>{sound=!sound;$("#soundBtn").textContent=sound?"🔊":"🔇"};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1500)}
+
+const cv=$("#confetti"),cx=cv.getContext("2d");let bits=[];
+function confetti(n=120){cv.width=innerWidth;cv.height=innerHeight;const c=["#19b3c6","#2bd4e8","#ffcf3f","#2bff9b","#ff6b81"];
+  for(let i=0;i<n;i++)bits.push({x:Math.random()*cv.width,y:-20,r:5+Math.random()*6,c:c[i%c.length],vy:2.5+Math.random()*3,vx:-2+Math.random()*4,a:Math.random()*6});
+  if(bits.length===n)requestAnimationFrame(cl)}
+function cl(){cx.clearRect(0,0,cv.width,cv.height);bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.a+=.12;cx.save();cx.translate(b.x,b.y);cx.rotate(b.a);cx.fillStyle=b.c;cx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.6);cx.restore()});bits=bits.filter(b=>b.y<cv.height+20);if(bits.length)requestAnimationFrame(cl);else cx.clearRect(0,0,cv.width,cv.height)}
+
+function show(id){$$(".screen").forEach(s=>s.classList.toggle("active",s.id===id))}
+$("#startBtn").onclick=()=>{beep([440,660]);cur=0;score=0;$("#score").textContent=0;show("q");render()};
+
+function render(){
+  const it=QS[cur]; answered=false;
+  $("#qnum").textContent=`שאלה ${cur+1} מתוך ${QS.length}`;
+  $("#dots").innerHTML=QS.map((_,k)=>`<div class="d ${k<cur?'done':k===cur?'on':''}"></div>`).join("");
+  $("#qbubble").innerHTML = it.bubble ? `<div class="bubble sms">${it.bubble}</div>` : "";
+  $("#qtext").textContent=it.q;
+  const box=$("#opts"); box.innerHTML="";
+  it.opts.forEach((o,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=o;b.onclick=()=>pick(i,b);box.appendChild(b);});
+  $("#explain").textContent=""; $("#nextBtn").style.display="none";
+}
+function pick(i,btn){
+  if(answered)return; answered=true;
+  const it=QS[cur]; const buttons=$$("#opts .opt");
+  buttons.forEach(b=>b.disabled=true);
+  if(i===it.correct){
+    btn.classList.add("right"); score++; $("#score").textContent=score; sGood(); confetti(70);
+    $("#explain").style.color="var(--good)"; $("#explain").textContent="✔ "+it.ex;
+  }else{
+    btn.classList.add("wrong"); buttons[it.correct].classList.add("right"); sBad();
+    $("#explain").style.color="var(--bad)"; $("#explain").textContent="❌ "+it.ex;
+  }
+  $("#nextBtn").style.display="inline-block";
+  $("#nextBtn").textContent = cur<QS.length-1 ? "הבא ←" : "לסיום 🏅";
+}
+$("#nextBtn").onclick=()=>{beep([440,660]); if(cur<QS.length-1){cur++;render();} else finish();};
+function finish(){
+  show("finish"); sWin(); confetti(220);
+  $("#stars").textContent = score===QS.length?"⭐⭐⭐":score>=4?"⭐⭐":"⭐";
+  $("#scoreLine").textContent=`ענית נכון על ${score} מתוך ${QS.length} שאלות!`;
+}
+$("#againBtn").onclick=()=>{beep([440,660]);show("intro")};
+</script>
+</body>
+</html>
