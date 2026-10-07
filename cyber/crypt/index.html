@@ -3,100 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>מעבדת ההצפנות – פענוח והצפנה</title>
+<title>מעבדת ההצפנות – פענוח הודעות</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --p1:#7b2ff7; --p2:#00d4ff; --gold:#ffcf3f; --good:#2bff9b; --bad:#ff5d73;
   --bg0:#0a0618; --bg1:#120a2a; --card:#17103a; --card2:#1d1448; --line:#34245f;
-  --ink:#ece7ff; --muted:#9a8fc9; --shadow:0 18px 50px rgba(0,0,0,.5); --mono:"Share Tech Mono",monospace;
+  --ink:#ece7ff; --muted:#9a8fc9; --p1:#7b2ff7; --p2:#00d4ff; --green:#2bff9b; --gold:#ffcf3f; --bad:#ff5d73;
+  --shadow:0 18px 50px rgba(0,0,0,.5); --mono:"Share Tech Mono",monospace;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
-body{
-  font-family:"Rubik",system-ui,Arial,sans-serif;color:var(--ink);
-  background:radial-gradient(circle at 10% 0,#3a1a7a 0,transparent 45%),
-             radial-gradient(circle at 95% 100%,#0a4a6e 0,transparent 42%),
-             linear-gradient(160deg,var(--bg0),var(--bg1));
-  background-attachment:fixed;overflow-x:hidden;
-}
+body{font-family:"Rubik",system-ui,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 10% 0,#3a1a7a 0,transparent 45%),radial-gradient(circle at 95% 100%,#0a4a6e 0,transparent 42%),linear-gradient(160deg,var(--bg0),var(--bg1));
+  background-attachment:fixed;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
   background-image:radial-gradient(circle,rgba(255,255,255,.08) 1px,transparent 1px);background-size:34px 34px}
 button{font-family:inherit;cursor:pointer}
-.wrap{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:16px 16px 70px}
+.wrap{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:16px 16px 60px}
 .topbar{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;gap:10px;
-  padding:10px 14px;margin-bottom:14px;background:rgba(10,6,24,.82);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px}
-.brand{font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,var(--p2),var(--p1));-webkit-background-clip:text;background-clip:text;color:transparent}
-.steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.chip{font-size:.82rem;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-.chip.on{background:linear-gradient(90deg,var(--p1),var(--p2));color:#fff;border:0}
-.chip.done{color:var(--good);border-color:var(--good)}
+  padding:12px 16px;margin-bottom:16px;background:rgba(10,6,24,.82);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px}
+.brand{font-weight:900;background:linear-gradient(90deg,var(--p2),var(--p1));-webkit-background-clip:text;background-clip:text;color:transparent}
 .icon-btn{background:rgba(123,47,247,.18);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:40px;height:36px;font-size:1rem}
-.screen{display:none;animation:fade .4s ease}
-.screen.active{display:block}
+.screen{display:none;animation:fade .4s ease}.screen.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px}
-h1,h2,h3{line-height:1.2;margin:.1em 0 .4em}
-h1{font-size:clamp(1.9rem,6vw,3rem);font-weight:900}
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:24px;text-align:center}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:900;margin:.1em 0}
+h2{font-size:clamp(1.4rem,4.5vw,2.2rem);font-weight:900;margin:.1em 0}
 .grad{background:linear-gradient(90deg,var(--p2),var(--p1),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{font-size:1.1rem;line-height:1.7;color:#d7cfff}
-.big-btn{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border:0;border-radius:12px;padding:14px 30px;font-size:1.15rem;font-weight:900;box-shadow:0 6px 18px rgba(123,47,247,.45);transition:transform .1s}
+.lead{font-size:1.15rem;line-height:1.7;color:#d7cfff;max-width:40ch;margin:10px auto}
+.big-btn{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;border:0;border-radius:14px;padding:15px 34px;font-size:1.2rem;font-weight:900;box-shadow:0 6px 18px rgba(123,47,247,.45);transition:transform .1s}
 .big-btn:active{transform:translateY(3px)}
 .big-btn.gold{background:linear-gradient(135deg,#ffb020,var(--gold));color:#3a2a00}
-.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:11px 20px;font-weight:700}
-.center{text-align:center}.mono{font-family:var(--mono)}
-.mission{background:rgba(123,47,247,.12);border:1px dashed var(--line);border-radius:14px;padding:16px 18px;margin:16px 0;line-height:1.8}
-/* ===== THE MACHINE: legend top + text bottom ===== */
-.machine{position:relative}
-.panel-title{display:flex;align-items:center;gap:8px;font-weight:900;color:var(--gold);margin-bottom:10px;font-size:1.05rem}
-.method-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.mtab{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#120a2a;color:var(--muted);font-weight:700;font-size:.95rem}
-.mtab.on{background:linear-gradient(90deg,var(--p1),var(--p2));color:#fff;border:0}
-.method-desc{color:var(--muted);font-size:.95rem;margin:-4px 0 12px;min-height:20px}
-/* LEGEND (top) */
-.legend{background:#0e0824;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
-.keyrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.keyrow label{font-weight:700;color:#d7cfff}
-.keyrow input[type=range]{flex:1;min-width:160px;accent-color:var(--p2)}
-.keyval{font-family:var(--mono);font-size:1.3rem;color:var(--gold);min-width:42px;text-align:center}
-.wheel{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
-.pair{display:flex;flex-direction:column;align-items:center;background:#17103a;border:1px solid var(--line);border-radius:8px;
-  min-width:34px;padding:5px 2px;transition:.15s}
-.pair .from{font-size:1.1rem;font-weight:700;color:#d7cfff}
-.pair .arr{font-size:.7rem;color:var(--muted);line-height:1}
-.pair .to{font-size:1.05rem;font-weight:700;color:var(--p2);font-family:var(--mono)}
-.pair.lit{background:linear-gradient(180deg,#2a1a5e,#1d1448);border-color:var(--p2);transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,212,255,.3)}
-/* TEXT (bottom) */
-.io{display:grid;grid-template-columns:1fr;gap:12px}
-.iobox label{display:block;font-weight:700;margin-bottom:6px;color:#d7cfff}
-.iobox textarea{width:100%;min-height:74px;font-size:1.15rem;padding:12px;border-radius:12px;background:#0e0824;border:1px solid var(--line);color:var(--ink);resize:vertical;font-family:inherit}
-.iobox textarea:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
-.out{min-height:74px;font-size:1.25rem;padding:12px;border-radius:12px;background:#0e0824;border:1px solid var(--line);
-  font-weight:700;letter-spacing:1px;line-height:1.7;word-break:break-word}
-.out .c{display:inline-block;transition:color .1s}
-.dir-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-.swap-btn{background:#17103a;border:1px solid var(--line);color:var(--gold);border-radius:999px;padding:8px 16px;font-weight:700}
-/* mission box */
-.msg-card{background:#0e0824;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
-.msg-enc{font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:2px;text-align:center;line-height:1.7;word-break:break-word}
-.answer-row{display:flex;gap:8px;margin-top:12px}
-.answer-row input{flex:1;font-size:1.1rem;padding:12px;border-radius:10px;background:#17103a;border:1px solid var(--line);color:var(--ink)}
-.result{margin-top:10px;font-weight:700;min-height:24px}
-.steps-list{counter-reset:s;padding:0;list-style:none}
-.steps-list li{counter-increment:s;position:relative;padding:8px 44px 8px 10px;margin-bottom:8px;background:#0e0824;border:1px solid var(--line);border-radius:10px;line-height:1.6}
-.steps-list li::before{content:counter(s);position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;display:grid;place-items:center;font-weight:900;font-size:.9rem}
-.lvl-dots{display:flex;gap:8px;justify-content:center;margin:10px 0}
-.lvl-dots .d{width:12px;height:12px;border-radius:50%;background:var(--line)}
-.lvl-dots .d.on{background:var(--gold)}.lvl-dots .d.done{background:var(--good)}
-.locked-note{background:rgba(255,207,63,.08);border-right:4px solid var(--gold);border-radius:10px;padding:12px 14px;line-height:1.7;margin-top:12px}
-.hdr-ico{font-size:2.4rem}
+.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:11px 22px;font-weight:700}
+.hdr-ico{font-size:3rem}
+.dots{display:flex;gap:8px;justify-content:center;margin:4px 0 14px}
+.dots .d{width:13px;height:13px;border-radius:50%;background:var(--line)}
+.dots .d.on{background:var(--gold);transform:scale(1.25)}.dots .d.done{background:var(--green)}
+.qnum{font-family:var(--mono);color:var(--muted);letter-spacing:1px}
+.method-tag{display:inline-block;background:rgba(123,47,247,.25);border:1px solid var(--p1);border-radius:999px;
+  padding:6px 18px;font-weight:900;font-size:1.05rem;margin:6px 0;color:#e9ddff}
+.rule{color:var(--muted);font-size:1.02rem;margin:4px auto 14px;max-width:36ch;line-height:1.5}
+.legend-box{background:#0e0824;border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 16px}
+.legend-title{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:900;color:var(--gold);margin-bottom:12px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pair{display:flex;flex-direction:column;align-items:center;background:#1d1448;border:2px solid var(--p1);border-radius:12px;min-width:60px;padding:8px 6px}
+.pair .sym{font-size:clamp(1.6rem,5vw,2.1rem);line-height:1}
+.pair .arr{color:var(--muted);font-size:.9rem;line-height:1.2}
+.pair .let{font-size:clamp(1.5rem,5vw,2rem);font-weight:900;color:var(--green);font-family:var(--mono)}
+.reverse-hint{font-size:1.3rem;line-height:1.8}
+.reverse-hint .ex{display:inline-flex;align-items:center;gap:10px;background:#1d1448;border:1px solid var(--line);border-radius:12px;padding:8px 18px;font-family:var(--mono);font-size:1.5rem;font-weight:700;margin-top:8px}
+.msg-label{color:var(--muted);margin-bottom:6px}
+.msg{font-family:var(--mono);font-size:clamp(2rem,9vw,3.4rem);font-weight:700;color:var(--gold);letter-spacing:8px;
+  background:#0e0824;border:1px dashed var(--line);border-radius:14px;padding:14px;word-break:break-word}
+.msg.sym{letter-spacing:12px}
+.answer-row{display:flex;gap:8px;margin-top:16px;max-width:460px;margin-inline:auto}
+.answer-row input{flex:1;font-size:1.4rem;font-weight:700;text-align:center;padding:12px;border-radius:12px;background:#17103a;border:2px solid var(--line);color:var(--ink)}
+.answer-row input:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
+.result{margin-top:12px;font-weight:900;min-height:28px;font-size:1.2rem}
+.row-btns{margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.badge-win{border:6px double var(--gold);border-radius:22px;padding:30px;background:linear-gradient(180deg,#1d1448,#120a2a)}
+.stars{font-size:3rem;letter-spacing:6px;margin:10px 0}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) scale(.85);background:#17103a;border:1px solid var(--p2);color:var(--ink);font-weight:700;padding:12px 24px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:150}
-.badge-win{text-align:center;border:6px double var(--gold);border-radius:22px;padding:26px;background:linear-gradient(180deg,#1d1448,#120a2a)}
-@media (max-width:780px){.steps{display:none}.card{padding:18px}.pair{min-width:28px}}
+@media (max-width:600px){.card{padding:18px}.pair{min-width:52px}}
 </style>
 </head>
 <body>
@@ -104,311 +75,143 @@ h1{font-size:clamp(1.9rem,6vw,3rem);font-weight:900}
 <div class="wrap">
   <div class="topbar">
     <div class="brand">🔐 מעבדת ההצפנות</div>
-    <div class="steps" id="steps">
-      <span class="chip" data-s="intro">0. מבוא</span>
-      <span class="chip" data-s="learn">1. איך זה עובד</span>
-      <span class="chip" data-s="missions">2. פענוח סודות</span>
-      <span class="chip" data-s="encode">3. כתבו בעצמכם</span>
-    </div>
+    <div class="qnum" id="topProg"></div>
     <button class="icon-btn" id="soundBtn" title="צליל">🔊</button>
   </div>
 
-  <!-- INTRO -->
   <section class="screen active" id="intro">
     <div class="card">
-      <div class="hdr-ico">🕵️‍♀️🔒</div>
-      <h1 class="grad">הקובץ הסודי של מר שמוליק</h1>
-      <p class="lead">פרצתם לחשבון של מר שמוליק ומצאתם בו קובץ… אבל הוא <b>מוצפן</b>! כל האותיות מעורבבות בקוד סודי. 🤔</p>
-      <div class="msg-card">
-        <div style="color:var(--muted);margin-bottom:6px">📄 SECRET.txt — תוכן מוצפן:</div>
-        <div class="msg-enc">ל צ ת ב   ט צ ת ב ז</div>
-      </div>
-      <p class="lead"><b>הצפנה</b> היא שפה סודית: מחליפים כל אות באות או בסימן אחר, כדי שרק מי שיודע את <b>המפתח</b> יוכל לקרוא. גם ווטסאפ, הבנק והצבא מצפינים את המידע שלהם!</p>
-      <div class="mission">
-        🎯 <b>המשימה שלכם, מפענחי צפנים:</b><br>
-        1️⃣ ללמוד 4 שיטות הצפנה בעזרת <b>מכונת ההצפנה</b>.<br>
-        2️⃣ לפענח 4 הודעות סודיות (כולל הקובץ של מר שמוליק!).<br>
-        3️⃣ לכתוב הודעה מוצפנת משלכם ולאתגר חבר.
-      </div>
-      <div class="center"><button class="big-btn" id="toLearn">נכנסים למעבדה 🔬</button></div>
+      <div class="hdr-ico">🕵️‍♀️🔓</div>
+      <h1 class="grad">פענחו את ההודעות הסודיות!</h1>
+      <p class="lead"><b>הצפנה</b> היא שפה סודית: כל אות מתחלפת באות או בסמל אחר. יש לכם <b>מקרא</b> (מפתח) שיעזור לפענח.</p>
+      <p class="lead">לפניכם <b>6 הודעות</b> מוצפנות, כל אחת בשיטה אחרת. בהצלחה, סוכנים! 🔎</p>
+      <button class="big-btn" id="startBtn">מתחילים 🚀</button>
     </div>
   </section>
 
-  <!-- LEARN (the machine) -->
-  <section class="screen" id="learn">
-    <div class="card machine">
-      <h2 class="grad">🛠️ מכונת ההצפנה</h2>
-      <p class="lead">בחרו שיטה למעלה, ושנו את ה<b>מפתח</b>. ה<b>מקרא</b> (למעלה) מראה לאיזו אות הופכת כל אות, וה<b>טקסט</b> (למטה) מתפענח מיד. שחקו!</p>
-
-      <div class="method-tabs" id="tabs"></div>
-      <div class="method-desc" id="methodDesc"></div>
-
-      <!-- LEGEND = top -->
-      <div class="panel-title">📖 מקרא (המפתח)</div>
-      <div class="legend">
-        <div class="keyrow" id="keyrow">
-          <label id="keyLabel">הזזה:</label>
-          <input type="range" id="keySlider" min="1" max="21" value="3">
-          <span class="keyval" id="keyVal">3</span>
-        </div>
-        <div class="wheel" id="wheel"></div>
-      </div>
-
-      <!-- TEXT = bottom -->
-      <div class="panel-title">✍️ טקסט</div>
-      <div class="dir-row">
-        <button class="swap-btn" id="swapBtn">🔁 מצב: הצפנה ⬅ פענוח</button>
-        <span class="mono" id="dirHint" style="color:var(--muted)"></span>
-      </div>
-      <div class="io">
-        <div class="iobox">
-          <label id="inLabel">טקסט רגיל:</label>
-          <textarea id="inText" dir="auto">שלום חברים</textarea>
-        </div>
-        <div class="iobox">
-          <label id="outLabel">תוצאה מוצפנת:</label>
-          <div class="out" id="outText"></div>
-        </div>
-      </div>
-      <div class="center" style="margin-top:16px"><button class="big-btn gold" id="toMissions">הבנתי! לפענוח סודות 🔍</button></div>
-    </div>
-  </section>
-
-  <!-- MISSIONS -->
-  <section class="screen" id="missions">
+  <section class="screen" id="q">
     <div class="card">
-      <h2 class="grad">🔍 פענוח סודות</h2>
-      <div class="lvl-dots" id="lvlDots"></div>
-      <h3 id="mTitle"></h3>
-      <p class="lead" id="mBrief"></p>
-      <div class="msg-card">
-        <div style="color:var(--muted);margin-bottom:8px" id="mHint"></div>
-        <div class="msg-enc" id="mEnc"></div>
+      <div class="dots" id="dots"></div>
+      <div class="method-tag" id="mTag"></div>
+      <div class="rule" id="mRule"></div>
+      <div class="legend-box" id="legendBox">
+        <div class="legend-title">📖 <span>מקרא (המפתח)</span></div>
+        <div class="legend" id="legend"></div>
       </div>
-
-      <div class="panel-title">📖 מקרא — נסו שיטות ומפתחות עד שההודעה תהיה הגיונית!</div>
-      <div class="method-tabs" id="mTabs"></div>
-      <div class="keyrow" id="mKeyrow">
-        <label id="mKeyLabel">הזזה:</label>
-        <input type="range" id="mKeySlider" min="1" max="21" value="1">
-        <span class="keyval" id="mKeyVal">1</span>
-      </div>
-
-      <div class="panel-title">🔓 מה שיצא (הטקסט המפוענח):</div>
-      <div class="out" id="mOut"></div>
-
+      <div class="msg-label">✉️ ההודעה המוצפנת:</div>
+      <div class="msg" id="msg"></div>
       <div class="answer-row">
-        <input id="mAnswer" placeholder="מה ההודעה המפוענחת? כתבו כאן...">
-        <button class="big-btn" id="mCheck">בדיקה</button>
+        <input id="answer" placeholder="מה כתוב?" autocomplete="off" dir="rtl">
+        <button class="big-btn" id="checkBtn">בדיקה</button>
       </div>
-      <div class="result" id="mResult"></div>
-      <div class="center" style="margin-top:10px">
-        <button class="ghost-btn" id="mHintBtn">💡 רמז</button>
-        <button class="ghost-btn" id="mNext" style="display:none">למשימה הבאה ←</button>
+      <div class="result" id="result"></div>
+      <div class="row-btns">
+        <button class="ghost-btn" id="hintBtn">💡 רמז</button>
+        <button class="big-btn gold" id="nextBtn" style="display:none">הבא ←</button>
       </div>
     </div>
   </section>
 
-  <!-- ENCODE -->
-  <section class="screen" id="encode">
-    <div class="card">
-      <h2 class="grad">✍️ כתבו הודעה סודית משלכם</h2>
-      <p class="lead">כתבו הודעה, בחרו שיטה ומפתח, ושלחו לחבר/ה את ההודעה המוצפנת + את המפתח (בנפרד!). רק מי שמחזיק את המפתח יוכל לקרוא.</p>
-
-      <div class="method-tabs" id="eTabs"></div>
-      <div class="keyrow" id="eKeyrow">
-        <label id="eKeyLabel">הזזה:</label>
-        <input type="range" id="eKeySlider" min="1" max="21" value="5">
-        <span class="keyval" id="eKeyVal">5</span>
-      </div>
-
-      <div class="io">
-        <div class="iobox"><label>ההודעה שלכם:</label><textarea id="eIn" dir="auto">נפגשים בשלוש ליד הנדנדה</textarea></div>
-        <div class="iobox"><label>ההודעה המוצפנת (זה מה ששולחים):</label><div class="out" id="eOut"></div></div>
-      </div>
-      <div class="center" style="margin-top:12px">
-        <button class="big-btn gold" id="eCopy">📋 העתקת ההודעה המוצפנת</button>
-      </div>
-
-      <div class="locked-note">
-        🔑 <b>זכרו:</b> את ה<b>מפתח</b> (השיטה + המספר) שולחים <b>בנפרד</b> מההודעה, או מספרים אותו רק פנים אל פנים. אם שולחים את שניהם יחד — זה כמו לנעול דלת ולהדביק עליה את המפתח! 😅
-      </div>
-
-      <div class="badge-win" style="margin-top:18px">
-        <div class="hdr-ico">🏅</div>
-        <h3 class="grad">כל הכבוד, מפענח/ת צפנים!</h3>
-        <p class="lead">סיימתם את מעבדת ההצפנות. עכשיו אתם יודעים לפענח ולהצפין כמו סוכני סייבר אמיתיים.</p>
-        <button class="ghost-btn" id="restart">🔄 מהתחלה</button>
-      </div>
+  <section class="screen" id="finish">
+    <div class="card badge-win">
+      <div class="hdr-ico">🏅</div>
+      <h1 class="grad">כל הכבוד, מפענח/ת צפנים!</h1>
+      <div class="stars" id="stars">⭐⭐⭐</div>
+      <p class="lead">פענחתם את כל 6 ההודעות הסודיות! עכשיו אתם יודעים איך עובדת הצפנה.</p>
+      <div id="scoreLine" class="lead" style="color:var(--gold);font-weight:700"></div>
+      <button class="ghost-btn" id="againBtn">🔄 לשחק שוב</button>
     </div>
   </section>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
-const state={sound:true};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const ALEF=["א","ב","ג","ד","ה","ו","ז","ח","ט","י","כ","ל","מ","נ","ס","ע","פ","צ","ק","ר","ש","ת"];
-const FINAL={"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"};
-const N=ALEF.length; const idx=l=>ALEF.indexOf(FINAL[l]||l);
-const TOFIN={'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ'};
-function finalize(s){return s.replace(/[כמנפצ](?=[^א-ת]|$)/g,m=>TOFIN[m]);}
+const FINAL={"ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ"}, TOFIN={"כ":"ך","מ":"ם","נ":"ן","פ":"ף","צ":"ץ"};
+const N=22, idx=l=>ALEF.indexOf(FINAL[l]||l);
+const SYMBOLS=["⭐","🌙","☁️","⚡","❄️","🔥","💧","🌈","🍎","🍌","🍕","🎈","🎁","🎸","⚽","🚗","✈️","🐶","🐱","🐠","🌵","🍄"];
 
-/* ciphers: encode a single letter given key */
-const METHODS={
-  shift:{name:"הזזה (Caesar)",key:"הזזה",min:1,max:21,def:3,needsKey:true,
-    desc:"כל אות זזה כמה מקומות קדימה באלפבית. זו השיטה של 'אות קדימה' (הזזה 1).",
-    enc:(l,k)=>{const i=idx(l);return i<0?l:ALEF[(i+k)%N]},
-    dec:(l,k)=>{const i=idx(l);return i<0?l:ALEF[(i-k+N*2)%N]}},
-  back:{name:"אות אחורה",key:"הזזה אחורה",min:1,max:21,def:1,needsKey:true,
-    desc:"כל אות זזה אחורה באלפבית. בהזזה 1: א הופכת ל־ת, ב ל־א וכך הלאה.",
-    enc:(l,k)=>{const i=idx(l);return i<0?l:ALEF[(i-k+N*2)%N]},
-    dec:(l,k)=>{const i=idx(l);return i<0?l:ALEF[(i+k)%N]}},
-  atbash:{name:'אתב"ש',needsKey:false,
-    desc:"אות ראשונה מתחלפת באחרונה: א=ת, ב=ש, ג=ר... (צופן הנביא ירמיהו!).",
-    enc:(l)=>{const i=idx(l);return i<0?l:ALEF[N-1-i]},
-    dec:(l)=>{const i=idx(l);return i<0?l:ALEF[N-1-i]}},
-  gematria:{name:"גימטריה (מספרים)",needsKey:false,
-    desc:"כל אות הופכת למספר לפי מקומה: א=1, ב=2, ג=3...",
-    enc:(l)=>{const i=idx(l);return i<0?l:(i+1)+"·"},
-    dec:(tok)=>{const n=parseInt(tok);return isNaN(n)?tok:(ALEF[n-1]||"?")}},
-  reverse:{name:"עברית הפוכה",needsKey:false,
-    desc:"פשוט קוראים את המילה מהסוף להתחלה: שלום ⬅ םולש.",
-    enc:(l)=>l,dec:(l)=>l}, // handled specially (whole-string reverse)
-};
-const METHOD_ORDER=["shift","back","atbash","gematria","reverse"];
+const QS=[
+  {type:"fwd", k:1, word:"חבר",  tag:"אות קדימה ➡️", rule:"כל אות הוזזה אות אחת קדימה באלפבית. חפשו במקרא כל אות סודית וקראו את האות האמיתית."},
+  {type:"back",k:1, word:"שמש",  tag:"אות אחורה ⬅️", rule:"כל אות הוזזה אות אחת אחורה באלפבית. היעזרו במקרא."},
+  {type:"fwd", k:2, word:"כלב",  tag:"אות קדימה (2) ➡️➡️", rule:"הפעם כל אות הוזזה שתי אותיות קדימה. היעזרו במקרא."},
+  {type:"reverse", word:"בית",   tag:"טקסט הפוך 🔄", rule:"אין כאן החלפת אותיות — פשוט קראו את המילה מהסוף להתחלה!"},
+  {type:"back",k:3, word:"מים",  tag:"אות אחורה (3) ⬅️⬅️⬅️", rule:"כל אות הוזזה שלוש אותיות אחורה. היעזרו במקרא."},
+  {type:"symbols", word:"חתול",  tag:"סמלים 🔣", rule:"כל אות הוחלפה בסמל. במקרא כל סמל עם האות שלו — פענחו!"},
+];
+let cur=0, score=0, solvedThis=false;
 
-/* apply a method to a whole string (encode direction) */
-function applyEnc(txt,method,key){
-  const m=METHODS[method];
-  if(method==="reverse") return [...txt].reverse().join("");
-  if(method==="gematria") return [...txt].map(ch=>{const i=idx(ch);return i<0?ch:(i+1)}).join(" ");
-  return [...txt].map(ch=>m.enc(ch,key)).join("");
-}
-function applyDec(txt,method,key){
-  const m=METHODS[method];
-  if(method==="reverse") return [...txt].reverse().join("");
-  if(method==="gematria") return txt.split(/[\s,·]+/).filter(Boolean).map(t=>m.dec(t)).join("");
-  return [...txt].map(ch=>m.dec(ch,key)).join("");
+function enc1(l,type,k){const i=idx(l);if(i<0)return l;
+  if(type==="fwd")return ALEF[(i+k)%N];
+  if(type==="back")return ALEF[(i-k+N*2)%N];
+  if(type==="symbols")return SYMBOLS[i];
+  return l}
+function encWord(q){
+  if(q.type==="reverse")return [...q.word].reverse().join("");
+  return [...q.word].map(c=>enc1(c,q.type,q.k)).join("");
 }
 
-/* ===== sound & confetti ===== */
-let actx;
-function beep(f,dur=.08,type="sine",vol=.14){if(!state.sound)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+let actx,sound=true;
+function beep(f,dur=.09,type="sine",vol=.12){if(!sound)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
   f.forEach((x,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=x;o.connect(g);g.connect(actx.destination);
   const t=actx.currentTime+i*dur;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)})}catch(e){}}
-const sWin=()=>beep([523,659,784,1046],.12), sGood=()=>beep([660,880],.1), sBad=()=>beep([200,160],.14,"sawtooth"), sTick=()=>beep([480],.03,"square",.05);
-$("#soundBtn").onclick=()=>{state.sound=!state.sound;$("#soundBtn").textContent=state.sound?"🔊":"🔇"};
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1400)}
+const sWin=()=>beep([523,659,784,1046],.13),sBad=()=>beep([200,160],.14,"sawtooth"),sTick=()=>beep([480],.04,"square",.06);
+$("#soundBtn").onclick=()=>{sound=!sound;$("#soundBtn").textContent=sound?"🔊":"🔇"};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1600)}
+
 const cv=$("#confetti"),cx=cv.getContext("2d");let bits=[];
-function confetti(n=150){cv.width=innerWidth;cv.height=innerHeight;const c=["#7b2ff7","#00d4ff","#ffcf3f","#2bff9b","#ff5d73"];
-  for(let i=0;i<n;i++)bits.push({x:Math.random()*cv.width,y:-20,r:4+Math.random()*6,c:c[i%c.length],vy:2+Math.random()*3,vx:-1.5+Math.random()*3,a:Math.random()*6});
-  if(bits.length===n)requestAnimationFrame(cloop)}
-function cloop(){cx.clearRect(0,0,cv.width,cv.height);bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.a+=.1;cx.save();cx.translate(b.x,b.y);cx.rotate(b.a);cx.fillStyle=b.c;cx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.6);cx.restore()});bits=bits.filter(b=>b.y<cv.height+20);if(bits.length)requestAnimationFrame(cloop);else cx.clearRect(0,0,cv.width,cv.height)}
+function confetti(n=140){cv.width=innerWidth;cv.height=innerHeight;const c=["#7b2ff7","#00d4ff","#ffcf3f","#2bff9b","#ff5d73"];
+  for(let i=0;i<n;i++)bits.push({x:Math.random()*cv.width,y:-20,r:5+Math.random()*6,c:c[i%c.length],vy:2.5+Math.random()*3,vx:-2+Math.random()*4,a:Math.random()*6});
+  if(bits.length===n)requestAnimationFrame(cl)}
+function cl(){cx.clearRect(0,0,cv.width,cv.height);bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.a+=.12;cx.save();cx.translate(b.x,b.y);cx.rotate(b.a);cx.fillStyle=b.c;cx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.6);cx.restore()});bits=bits.filter(b=>b.y<cv.height+20);if(bits.length)requestAnimationFrame(cl);else cx.clearRect(0,0,cv.width,cv.height)}
 
-/* ===== nav ===== */
-const ORDER=["intro","learn","missions","encode"];
-function show(id){$$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
-  const i=ORDER.indexOf(id);$$("#steps .chip").forEach(c=>{const k=ORDER.indexOf(c.dataset.s);c.classList.toggle("on",k===i);c.classList.toggle("done",k<i)});
-  scrollTo({top:0,behavior:"smooth"})}
-$("#toLearn").onclick=()=>{beep([440,660]);show("learn");initLearn()};
+function show(id){$$(".screen").forEach(s=>s.classList.toggle("active",s.id===id))}
+$("#startBtn").onclick=()=>{beep([440,660]);cur=0;score=0;show("q");render()};
 
-/* ===== LEARN machine ===== */
-let L={method:"shift",key:3,encMode:true};
-function buildTabs(container,current,onPick){
-  container.innerHTML="";
-  METHOD_ORDER.forEach(m=>{const b=document.createElement("button");b.className="mtab"+(m===current?" on":"");
-    b.textContent=METHODS[m].name;b.onclick=()=>{sTick();onPick(m)};container.appendChild(b)});
+function render(){
+  const q=QS[cur];solvedThis=false;
+  $("#topProg").textContent=`הודעה ${cur+1} / ${QS.length}`;
+  $("#dots").innerHTML=QS.map((_,k)=>`<div class="d ${k<cur?'done':k===cur?'on':''}"></div>`).join("");
+  $("#mTag").textContent=q.tag; $("#mRule").textContent=q.rule;
+  const lb=$("#legendBox"), lg=$("#legend");
+  if(q.type==="reverse"){
+    lb.querySelector(".legend-title").innerHTML='🔄 <span>איך מפענחים?</span>';
+    lg.innerHTML='<div class="reverse-hint">קוראים מהסוף להתחלה 👈<br><span class="ex">דג <span style="color:var(--gold)">➜</span> גד</span></div>';
+  }else{
+    lb.querySelector(".legend-title").innerHTML='📖 <span>מקרא (המפתח)</span>';
+    const seen=[];const pairs=[];
+    [...q.word].forEach(ch=>{const r=idx(ch);if(r<0||seen.includes(r))return;seen.push(r);
+      pairs.push({sym:enc1(ch,q.type,q.k),let:ALEF[r]})});
+    lg.innerHTML=pairs.map(p=>`<div class="pair"><div class="sym">${p.sym}</div><div class="arr">▼</div><div class="let">${p.let}</div></div>`).join("");
+  }
+  const enc=encWord(q);
+  $("#msg").className="msg"+(q.type==="symbols"?" sym":"");
+  $("#msg").textContent = q.type==="symbols" ? [...enc].join(" ") : enc;
+  $("#answer").value="";$("#result").textContent="";$("#nextBtn").style.display="none";
+  setTimeout(()=>$("#answer").focus(),100);
 }
-function initLearn(){
-  buildTabs($("#tabs"),L.method,m=>{L.method=m;L.key=METHODS[m].def||1;syncKeyUI("#keyrow","#keyLabel","#keySlider","#keyVal",L.method,L.key);$$("#tabs .mtab").forEach((b,i)=>b.classList.toggle("on",METHOD_ORDER[i]===m));$("#methodDesc").textContent=METHODS[m].desc;renderLearn()});
-  $("#methodDesc").textContent=METHODS[L.method].desc;
-  syncKeyUI("#keyrow","#keyLabel","#keySlider","#keyVal",L.method,L.key);
-  $("#keySlider").oninput=e=>{L.key=+e.target.value;$("#keyVal").textContent=L.key;renderLearn()};
-  $("#inText").oninput=renderLearn;
-  $("#swapBtn").onclick=()=>{L.encMode=!L.encMode;sTick();
-    $("#swapBtn").textContent=L.encMode?"🔁 מצב: הצפנה ⬅ פענוח":"🔁 מצב: פענוח ⬅ הצפנה";
-    $("#inLabel").textContent=L.encMode?"טקסט רגיל:":"טקסט מוצפן:";
-    $("#outLabel").textContent=L.encMode?"תוצאה מוצפנת:":"תוצאה מפוענחת:";renderLearn()};
-  renderLearn();
+function norm(s){return (s||"").trim().split("").map(c=>FINAL[c]||c).join("").replace(/[\s"'.,־-]/g,"")}
+function check(){
+  if(solvedThis)return;
+  const q=QS[cur];
+  if(norm($("#answer").value)===norm(q.word)){
+    solvedThis=true;score++;sWin();confetti(100);
+    $("#result").style.color="var(--green)";$("#result").textContent="✔ נכון! פענחתם: "+q.word;
+    $("#nextBtn").style.display="inline-block";
+    $("#nextBtn").textContent=cur<QS.length-1?"הבא ←":"סיימתם! 🏅";
+  }else{sBad();$("#result").style.color="var(--bad)";$("#result").textContent="❌ לא בדיוק. היעזרו במקרא ונסו שוב!"}
 }
-function syncKeyUI(rowSel,labSel,sldSel,valSel,method,key){
-  const m=METHODS[method];const row=$(rowSel);
-  if(m.needsKey){row.style.display="flex";$(labSel).textContent=m.key+":";const s=$(sldSel);s.min=m.min;s.max=m.max;s.value=key;$(valSel).textContent=key;}
-  else row.style.display="none";
+$("#checkBtn").onclick=check;
+$("#answer").addEventListener("keydown",e=>{if(e.key==="Enter")check()});
+$("#hintBtn").onclick=()=>{toast("💡 האות הראשונה היא: "+QS[cur].word[0])};
+$("#nextBtn").onclick=()=>{sTick();if(cur<QS.length-1){cur++;render()}else finish()};
+function finish(){
+  show("finish");sWin();confetti(240);
+  $("#stars").textContent = score===QS.length?"⭐⭐⭐":score>=4?"⭐⭐":"⭐";
+  $("#scoreLine").textContent=`פענחתם ${score} מתוך ${QS.length} הודעות!`;
 }
-function renderWheel(elSel,method,key,litLetters){
-  const w=$(elSel);w.innerHTML="";
-  ALEF.forEach(l=>{const to=(method==="reverse")?l:applyEnc(l,method,key);
-    const d=document.createElement("div");d.className="pair"+(litLetters&&litLetters.has(l)?" lit":"");
-    d.innerHTML=`<div class="from">${l}</div><div class="arr">▼</div><div class="to">${method==="reverse"?"↺":to}</div>`;
-    w.appendChild(d)});
-}
-function renderLearn(){
-  const used=new Set([...$("#inText").value].map(c=>FINAL[c]||c).filter(c=>idx(c)>=0));
-  renderWheel("#wheel",L.method,L.key,used);
-  const txt=$("#inText").value;
-  const out=L.encMode?applyEnc(txt,L.method,L.key):applyDec(txt,L.method,L.key);
-  $("#outText").textContent=(L.method==="gematria"&&L.encMode)?out:finalize(out);
-  $("#dirHint").textContent=L.method==="reverse"?"(בשיטה הזו אין מפתח — פשוט הופכים)":"";
-}
-$("#toMissions").onclick=()=>{beep([440,660]);show("missions");startMission(0)};
-
-/* ===== MISSIONS ===== */
-const MISSIONS=[
-  {title:"משימה 1 — חימום",brief:"הודעה שהוצפנה בשיטת אתב\"ש. בחרו אתב\"ש במקרא וראו מה יוצא.",
-   hint:'השתמשו בשיטת אתב"ש (אין מפתח).',plain:"שלום",method:"atbash",key:0,
-   encHint:'רמז: השיטה היא אתב"ש.'},
-  {title:"משימה 2 — ההזזה הנעלמת",brief:"ההודעה הוצפנה בהזזה קדימה, אבל לא יודעים בכמה. נסו מפתחות עד שתצא מילה הגיונית!",
-   hint:"בחרו שיטת 'הזזה' והזיזו את המחוון לאט. כשהמילה תהיה הגיונית — תפסתם את המפתח!",plain:"מחשב",method:"shift",key:5},
-  {title:"משימה 3 — הקובץ של מר שמוליק",brief:"זוכרים את הקובץ המוצפן מהפעילות הקודמת? הגיע הזמן לפענח אותו! הוא הוצפן בהזזה.",
-   hint:"שיטת 'הזזה'. הזיזו את המחוון עד שיתגלה משפט על כסף. (המפתח הוא 7, אבל נסו לגלות לבד!)",plain:"הכסף בכספת",method:"shift",key:7},
-  {title:"משימה 4 — אתגר הסיום",brief:"הודעת פרידה מוצפנת באתב\"ש. פענחו אותה כדי לסיים את המעבדה בכבוד!",
-   hint:'אתב"ש שוב — אבל הפעם ההודעה ארוכה יותר.',plain:"כל הכבוד גיבורים",method:"atbash",key:0},
-];
-let M={i:0,method:"atbash",key:1,solved:false};
-function startMission(i){
-  M.i=i;M.solved=false;const m=MISSIONS[i];
-  $("#lvlDots").innerHTML=MISSIONS.map((_,k)=>`<div class="d ${k<i?'done':k===i?'on':''}"></div>`).join("");
-  $("#mTitle").textContent=m.title;$("#mBrief").textContent=m.brief;
-  $("#mHint").textContent="📄 הודעה מוצפנת:";
-  $("#mEnc").textContent=spaced(finalize(applyEnc(m.plain,m.method,m.key)));
-  M.method=(m.method==="atbash")?"atbash":"shift"; M.key=1;
-  buildTabs($("#mTabs"),M.method,mm=>{M.method=mm;M.key=METHODS[mm].def||1;syncKeyUI("#mKeyrow","#mKeyLabel","#mKeySlider","#mKeyVal",mm,M.key);$$("#mTabs .mtab").forEach((b,ix)=>b.classList.toggle("on",METHOD_ORDER[ix]===mm));renderMission()});
-  syncKeyUI("#mKeyrow","#mKeyLabel","#mKeySlider","#mKeyVal",M.method,M.key);
-  $("#mKeySlider").oninput=e=>{M.key=+e.target.value;$("#mKeyVal").textContent=M.key;renderMission()};
-  $("#mAnswer").value="";$("#mResult").textContent="";$("#mNext").style.display="none";
-  renderMission();
-}
-function spaced(s){return [...s].join(" ")}
-function renderMission(){
-  const m=MISSIONS[M.i];
-  const dec=applyDec(applyEnc(m.plain,m.method,m.key),M.method,M.key);
-  $("#mOut").textContent=finalize(dec);
-}
-function norm(s){return (s||"").replace(/[\s"'.,־-]/g,"")}
-$("#mCheck").onclick=()=>{
-  const m=MISSIONS[M.i];
-  if(norm($("#mAnswer").value)===norm(m.plain)){
-    $("#mResult").style.color="var(--good)";$("#mResult").textContent="✔ נכון! פענחתם את ההודעה!";
-    sWin();confetti(120);M.solved=true;$("#mNext").style.display="inline-block";
-    $("#mNext").textContent=M.i<MISSIONS.length-1?"למשימה הבאה ←":"סיימתם! לכתיבת הודעה ←";
-  }else{$("#mResult").style.color="var(--bad)";$("#mResult").textContent="❌ עדיין לא. כוונו את המקרא עד שהטקסט יהיה הגיוני, והעתיקו אותו.";sBad()}
-};
-$("#mHintBtn").onclick=()=>{toast("💡 "+MISSIONS[M.i].hint)};
-$("#mNext").onclick=()=>{beep([440,660]);if(M.i<MISSIONS.length-1)startMission(M.i+1);else{show("encode");initEncode()}};
-
-/* ===== ENCODE ===== */
-let E={method:"shift",key:5};
-function initEncode(){
-  buildTabs($("#eTabs"),E.method,m=>{E.method=m;E.key=METHODS[m].def||1;syncKeyUI("#eKeyrow","#eKeyLabel","#eKeySlider","#eKeyVal",m,E.key);$$("#eTabs .mtab").forEach((b,i)=>b.classList.toggle("on",METHOD_ORDER[i]===m));renderEncode()});
-  syncKeyUI("#eKeyrow","#eKeyLabel","#eKeySlider","#eKeyVal",E.method,E.key);
-  $("#eKeySlider").oninput=e=>{E.key=+e.target.value;$("#eKeyVal").textContent=E.key;renderEncode()};
-  $("#eIn").oninput=renderEncode;renderEncode();
-}
-function renderEncode(){const o=applyEnc($("#eIn").value,E.method,E.key);$("#eOut").textContent=(E.method==="gematria")?o:finalize(o)}
-$("#eCopy").onclick=()=>{const t=$("#eOut").textContent;navigator.clipboard&&navigator.clipboard.writeText(t);toast("📋 הועתק! שלחו לחבר/ה");sGood()};
-$("#restart").onclick=()=>{beep([440,660]);show("intro")};
+$("#againBtn").onclick=()=>{beep([440,660]);show("intro")};
 </script>
 </body>
 </html>

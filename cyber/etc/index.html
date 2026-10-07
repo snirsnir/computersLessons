@@ -89,6 +89,13 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
 .stat-box .n{font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--term)}
 .stat-box .l{color:var(--muted);font-size:.82rem}
 .combo-list{font-family:var(--mono);font-size:.8rem;color:var(--muted);max-height:90px;overflow:auto;background:#010806;border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:10px}
+.cand-head{font-size:1.1rem;font-weight:700;margin-bottom:12px;color:var(--ink)}
+.cand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.cand{font-family:var(--mono);font-size:1.25rem;font-weight:700;padding:14px;border-radius:12px;background:#02110c;border:2px solid var(--line);color:var(--term);cursor:pointer;transition:.12s;letter-spacing:1px}
+.cand:hover{border-color:var(--term);transform:translateY(-2px)}
+.cand.wrong{border-color:var(--red);color:var(--red);text-decoration:line-through;opacity:.55;cursor:not-allowed}
+.cand.right{border-color:var(--term);background:var(--term);color:#021}
+.cand-note{color:var(--muted);font-size:.9rem;margin-top:10px}
 .manual{display:flex;gap:8px;margin-top:10px}
 .manual input{flex:1;font-family:var(--mono);padding:10px;border-radius:10px;background:#02110c;border:1px solid var(--line);color:var(--term)}
 /* cracked */
@@ -187,7 +194,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
   <section class="screen" id="crack">
     <div class="card">
       <h2 class="term-title">⚡ שלב 3 — מחולל הסיסמאות (Brute Force)</h2>
-      <p class="lead">המחולל בנה <b id="comboCount">0</b> ניחושים מהמידע שהזנתם. לחצו <b>הפעל</b> וצפו במחשב מנסה אותם אחד אחרי השני — בדיוק כמו האקר אמיתי.</p>
+      <p class="lead">המחולל בנה <b id="comboCount">0</b> ניחושים מהמידע שהזנתם. לחצו <b>הפעל</b> וצפו במחשב סורק — ואז הוא יצמצם ל<b>־6 סיסמאות אפשריות</b> שתצטרכו לנסות בעצמכם.</p>
       <div class="cracker">
         <div class="screen-main">
           <div class="feed" id="feed"></div>
@@ -208,6 +215,11 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
           <div class="combo-list" id="comboList"></div>
         </div>
       </div>
+      <div id="candPanel" style="display:none;margin-top:18px">
+        <div class="cand-head">🎯 נמצאו <b>6 סיסמאות אפשריות</b> — אבל רק <b>אחת</b> נכונה! נסו אותן עד שתפרצו:</div>
+        <div class="cand-grid" id="candGrid"></div>
+        <div class="cand-note">לוחצים על סיסמה כדי לנסות אותה (או מקלידים אותה בתיבה למעלה). כל פתיחה של האתר — הסיסמה הנכונה שונה! 🎲</div>
+      </div>
     </div>
   </section>
 
@@ -220,7 +232,7 @@ h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
       <div class="mono" id="foundMeta" style="color:var(--muted)"></div>
       <div class="lesson" style="text-align:right">
         🎯 <b>איך זה קרה כל כך מהר?</b><br>
-        הסיסמה של מר שמוליק הייתה בנויה מ<b>מידע אישי</b> שכולם יכולים למצוא עליו ברשת: שם חיית המחמד ושנת הלידה. המחשב ניסה את כל הצירופים של המידע הזה תוך שניות ומצא אותה. <br>
+        הסיסמה של מר שמוליק הייתה בנויה מ<b>מידע אישי</b> שכולם יכולים למצוא עליו ברשת (שם חיית המחמד, שנת לידה, קבוצה אהודה…). המחשב צמצם תוך שניות ל<b>6 אפשרויות בלבד</b>, וכל מה שנשאר היה לנסות אותן עד שאחת עבדה. <br>
         מחשב אמיתי יכול לנסות <b>מיליוני</b> ניחושים בשנייה אחת!
       </div>
       <div class="recipe" style="text-align:right">
@@ -259,7 +271,7 @@ const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const state={sound:true};
 
 /* ===== target (fictional) ===== */
-const TARGET={pw:"luna2011", pet:"luna", year:"2011", name:"שמוליק"};
+let CANDIDATES=[], correctIdx=0;
 
 /* ===== matrix rain ===== */
 (function(){
@@ -401,14 +413,15 @@ function buildCombos(){
   }
   // guarantee target reachable only if its parts were entered
   COMBOS=[...base];
-  // shuffle but remember target index
   for(let i=COMBOS.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[COMBOS[i],COMBOS[j]]=[COMBOS[j],COMBOS[i]]}
+  CANDIDATES=buildCandidates(); correctIdx=Math.floor(Math.random()*CANDIDATES.length);
 }
 
 /* ===== cracking animation ===== */
 let crackState;
 function setupCrack(){
-  crackState={running:false,idx:0,found:false,delay:70};
+  crackState={running:false,idx:0,done:false,found:false,delay:70,scanTotal:Math.min(Math.max(COMBOS.length,24),60)};
+  $("#candPanel").style.display="none"; $("#candGrid").innerHTML="";
   $("#comboCount").textContent=COMBOS.length;
   $("#comboN").textContent=COMBOS.length; $("#triedN").textContent=0;
   $("#bar").style.width="0"; $("#progTxt").textContent="מוכן להפעלה"; $("#speedTxt").textContent="";
@@ -416,50 +429,75 @@ function setupCrack(){
   const cl=$("#comboList"); cl.textContent=COMBOS.slice(0,120).join("  ");
 }
 function step(){
-  if(!crackState.running||crackState.found)return;
+  if(!crackState.running||crackState.done)return;
   const batch=crackState.delay<30?6:1;
   for(let b=0;b<batch;b++){
-    if(crackState.idx>=COMBOS.length){ // ran out without hit (shouldn't happen if target included)
-      crackState.running=false;$("#progTxt").textContent="לא נמצאה סיסמה — נסו להוסיף פרטים";sBad();return;
+    if(crackState.idx>=crackState.scanTotal){
+      crackState.running=false;crackState.done=true;$("#bar").style.width="100%";$("#progTxt").textContent="✔ צומצם ל־6 אפשרויות!";revealCandidates();return;
     }
-    const guess=COMBOS[crackState.idx++];
+    const guess=COMBOS[crackState.idx % COMBOS.length]; crackState.idx++;
     const line=document.createElement("div");
-    const hit=(guess.toLowerCase()===TARGET.pw);
     line.className="try"; line.textContent="try > "+guess;
     const feed=$("#feed"); feed.insertBefore(line,feed.firstChild);
     while(feed.children.length>14)feed.removeChild(feed.lastChild);
     $("#triedN").textContent=crackState.idx;
-    const pct=Math.round(crackState.idx/COMBOS.length*100);
+    const pct=Math.round(crackState.idx/crackState.scanTotal*100);
     $("#bar").style.width=pct+"%"; $("#progTxt").textContent="סורק... "+pct+"%";
     $("#speedTxt").textContent=(crackState.delay<30?"מצב מהיר ⏩":"")+"";
-    if(hit){
-      line.className=""; line.innerHTML='<span class="hit">✔ MATCH: '+guess+'</span>';
-      crackState.found=true;crackState.running=false; sHit();
-      $("#progTxt").textContent="נפרץ! ✔"; $("#bar").style.width="100%";
-      setTimeout(()=>finishCrack(guess),900); return;
-    } else if(b===0) sType();
+    if(b===0) sType();
   }
   setTimeout(step,crackState.delay);
 }
 $("#runBtn").onclick=()=>{
-  if(crackState.running)return;
-  if(!COMBOS.some(c=>c.toLowerCase()===TARGET.pw)){
-    toast("חסר מידע! חזרו ובדקו ששם חיית המחמד ושנת הלידה מולאו");sBad();show("clues");return;
-  }
+  if(crackState.running||crackState.done)return;
   crackState.running=true;$("#runBtn").disabled=true;beep([330,440]);step();
 };
 $("#turboBtn").onclick=()=>{crackState.delay=crackState.delay<30?70:12;toast(crackState.delay<30?"מצב מהיר ⏩":"מהירות רגילה")};
 $("#manualBtn").onclick=tryManual;
 $("#manualPw").addEventListener("keydown",e=>{if(e.key==="Enter")tryManual()});
 function tryManual(){
-  const v=$("#manualPw").value.trim().toLowerCase(); if(!v)return;
-  if(v===TARGET.pw){sHit();finishCrack($("#manualPw").value.trim())}
-  else{sBad();toast("❌ לא נכון — תנו למחשב לנסות!");$("#manualPw").value=""}
+  const v=($("#manualPw").value||"").trim().toLowerCase(); if(!v)return;
+  if(!crackState||!crackState.done){toast("קודם הפעילו את ה־Brute Force ⚡");return;}
+  if(crackState.found)return;
+  if(v===CANDIDATES[correctIdx].toLowerCase()){const i=correctIdx;crackState.found=true;markCand(i,true);sHit();finishCrack(CANDIDATES[i]);}
+  else if(CANDIDATES.some(c=>c.toLowerCase()===v)){const i=CANDIDATES.findIndex(c=>c.toLowerCase()===v);markCand(i,false);sBad();toast("❌ זו אחת מהאפשרויות — אבל לא הנכונה!");$("#manualPw").value="";}
+  else{sBad();toast("❌ לא ברשימה. נסו אחת מ־6 הסיסמאות!");$("#manualPw").value="";}
 }
 function finishCrack(pw){
   $("#foundPw").textContent=pw;
-  $("#foundMeta").textContent=`= "${TARGET.pet}" (חיית המחמד) + ${TARGET.year} (שנת הלידה)`;
-  show("done"); buildEnc();
+  $("#foundMeta").textContent="אחת מ־6 הסיסמאות שהמחשב בנה מהמידע האישי של מר שמוליק";
+  setTimeout(()=>{show("done"); buildEnc();},700);
+}
+function buildCandidates(){
+  const get=k=>($("#c_"+k).value||"").trim();
+  const pet=translit(get("pet")),name=translit(get("name")),team=translit(get("team")),hobby=translit(get("hobby")),city=translit(get("city"));
+  let year=(get("year").match(/\d{2,4}/)||[""])[0]; const y2=year.slice(-2);
+  const cap=w=>w?w[0].toUpperCase()+w.slice(1):w;
+  const cand=[]; const push=v=>{if(v&&v.length>=4&&!cand.includes(v))cand.push(v);};
+  if(pet&&year){push(pet+year);push(cap(pet)+year);push(pet+year+"!");push(year+pet);}
+  if(name&&year)push(name+year);
+  if(team&&year)push(team+year);
+  if(hobby&&year)push(hobby+year);
+  if(pet)push(pet+"123");
+  const base=[pet,name,team,hobby,city].filter(Boolean);
+  const ys=[year,String((parseInt(year)||2011)+1),y2,"123"].filter(Boolean);
+  for(const w of base){for(const y of ys){push(w+y);push(cap(w)+y);if(cand.length>=10)break;}}
+  let i=0; while(cand.length<6){push((pet||"pass")+(100+i*7));i++;}
+  const six=cand.slice(0,6);
+  for(let k=six.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[six[k],six[j]]=[six[j],six[k]];}
+  return six;
+}
+function revealCandidates(){
+  const grid=$("#candGrid"); grid.innerHTML="";
+  CANDIDATES.forEach((c,i)=>{const b=document.createElement("button");b.className="cand";b.textContent=c;b.onclick=()=>tryCandidate(i);grid.appendChild(b);});
+  $("#candPanel").style.display="block"; sHit();
+  $("#candPanel").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function markCand(i,ok){const b=$("#candGrid").children[i]; if(b){b.classList.add(ok?"right":"wrong"); if(!ok)b.disabled=true;}}
+function tryCandidate(i){
+  if(crackState.found)return;
+  if(i===correctIdx){crackState.found=true;markCand(i,true);sHit();toast("🔓 פרצנו!");finishCrack(CANDIDATES[i]);}
+  else{markCand(i,false);sBad();toast("❌ לא זו — נסו אחרת!");}
 }
 
 /* ===== password strength tester ===== */
