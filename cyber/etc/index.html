@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מבצע חדירה – שיטת Brute Force</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --term:#00ff88; --term2:#39d0ff; --amber:#ffcf3f; --red:#ff4d5e; --pink:#ff5fb0;
+  --bg0:#030a08; --bg1:#07140f; --card:#0c1a16; --line:#143a2c; --ink:#d9ffe9; --muted:#6f9888;
+  --shadow:0 18px 50px rgba(0,0,0,.55); --mono:"Share Tech Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:"Rubik",system-ui,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 15% 0,#0a3a2a 0,transparent 45%),
+             radial-gradient(circle at 90% 100%,#06303f 0,transparent 45%),
+             linear-gradient(160deg,var(--bg0),var(--bg1));
+  background-attachment:fixed; overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background:repeating-linear-gradient(to bottom,rgba(0,255,136,.04) 0 1px,transparent 1px 3px)}
+#rain{position:fixed;inset:0;z-index:0;opacity:.14;pointer-events:none}
+button{font-family:inherit;cursor:pointer}
+.wrap{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:16px 16px 70px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:10px 14px;margin-bottom:14px;background:rgba(3,12,9,.82);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:14px}
+.brand{font-family:var(--mono);font-weight:700;color:var(--term);letter-spacing:1px}
+.brand .blink{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.chip{font-family:var(--mono);font-size:.8rem;padding:4px 10px;border-radius:8px;border:1px solid var(--line);color:var(--muted)}
+.chip.on{color:#031;background:var(--term);border-color:var(--term)}
+.chip.done{color:var(--term);border-color:var(--term)}
+.icon-btn{background:rgba(0,255,136,.08);border:1px solid var(--line);color:var(--term);border-radius:10px;width:40px;height:36px;font-size:1rem}
+.screen{display:none;animation:fade .4s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(180deg,var(--card),#081310);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:26px;margin-bottom:16px}
+h1,h2,h3{line-height:1.2;margin:.1em 0 .45em}
+h1{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900}
+.term-title{font-family:var(--mono);color:var(--term)}
+.lead{font-size:1.1rem;line-height:1.7;color:#bfe9d4}
+.big-btn{background:linear-gradient(180deg,var(--term),#00c06a);color:#021;border:0;border-radius:12px;
+  padding:14px 30px;font-size:1.15rem;font-weight:900;box-shadow:0 5px 0 #007a43;transition:transform .1s}
+.big-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #007a43}
+.big-btn.blue{background:linear-gradient(180deg,var(--term2),#17a7d8);box-shadow:0 5px 0 #0a6d91;color:#012}
+.big-btn:disabled{filter:grayscale(.6) brightness(.7);box-shadow:none;cursor:not-allowed}
+.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px 22px;font-weight:700}
+.center{text-align:center}
+.mono{font-family:var(--mono)}
+/* intro boot log */
+.boot{font-family:var(--mono);background:#020705;border:1px solid var(--line);border-radius:14px;padding:16px;min-height:190px;color:var(--term);font-size:.98rem;line-height:1.75;white-space:pre-wrap}
+.boot .q{color:var(--term2)} .boot .w{color:var(--amber)} .boot .b{color:var(--red)}
+.mission{background:rgba(0,255,136,.05);border:1px dashed var(--line);border-radius:14px;padding:14px 18px;margin:16px 0;line-height:1.8}
+.kbd{font-family:var(--mono);background:#02110c;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--amber)}
+/* story / case file */
+.folder-tab{display:inline-block;background:var(--amber);color:#3a2a00;font-weight:900;padding:5px 18px;border-radius:12px 12px 0 0;font-family:var(--mono)}
+.dossier{background:#0b1713;border:1px solid var(--line);border-top-right-radius:0;border-radius:0 16px 16px 16px;padding:22px}
+.dossier p{font-size:1.1rem;line-height:1.9;margin:.5em 0}
+.clue{background:linear-gradient(transparent 60%,rgba(255,207,63,.35) 60%);cursor:help;font-weight:700;border-radius:3px;padding:0 2px}
+.hint-tip{color:var(--muted);font-size:.95rem;margin-top:10px}
+/* clue board */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field label{display:block;font-weight:700;margin-bottom:6px;color:#bfe9d4;font-size:.98rem}
+.field input{width:100%;font-family:var(--mono);font-size:1.05rem;padding:11px 12px;border-radius:10px;
+  background:#02110c;border:1px solid var(--line);color:var(--term)}
+.field input:focus{outline:none;border-color:var(--term);box-shadow:0 0 0 3px rgba(0,255,136,.15)}
+.field .ex{color:var(--muted);font-size:.82rem;margin-top:4px}
+.toggle-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.toggle{display:flex;align-items:center;gap:8px;background:#02110c;border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;user-select:none;font-weight:700}
+.toggle input{width:18px;height:18px;accent-color:var(--term)}
+/* cracker */
+.cracker{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.screen-main{background:#010806;border:1px solid var(--line);border-radius:14px;padding:14px;font-family:var(--mono)}
+.feed{height:230px;overflow:hidden;position:relative;font-size:.95rem;line-height:1.55}
+.feed .try{color:var(--muted)}
+.feed .hit{color:#021;background:var(--term);font-weight:700;padding:1px 6px;border-radius:5px;display:inline-block}
+.gauge{margin-top:12px}
+.bar{height:16px;background:#02110c;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,var(--term2),var(--term));transition:width .15s}
+.stat{display:flex;justify-content:space-between;font-family:var(--mono);color:var(--muted);font-size:.9rem;margin-top:6px}
+.sidestat{display:flex;flex-direction:column;gap:10px}
+.stat-box{background:#02110c;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.stat-box .n{font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--term)}
+.stat-box .l{color:var(--muted);font-size:.82rem}
+.combo-list{font-family:var(--mono);font-size:.8rem;color:var(--muted);max-height:90px;overflow:auto;background:#010806;border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:10px}
+.manual{display:flex;gap:8px;margin-top:10px}
+.manual input{flex:1;font-family:var(--mono);padding:10px;border-radius:10px;background:#02110c;border:1px solid var(--line);color:var(--term)}
+/* cracked */
+.cracked-pw{font-family:var(--mono);font-size:clamp(1.6rem,6vw,2.8rem);font-weight:700;color:#021;background:var(--term);
+  display:inline-block;padding:8px 22px;border-radius:12px;letter-spacing:2px;margin:8px 0}
+.lesson{background:rgba(255,77,94,.07);border-right:5px solid var(--red);border-radius:12px;padding:14px 18px;line-height:1.8;margin:14px 0}
+.lesson b{color:#ff9aa6}
+.recipe{background:rgba(0,255,136,.06);border-right:5px solid var(--term);border-radius:12px;padding:14px 18px;margin:14px 0}
+.pwtest{display:flex;gap:8px;margin-top:10px}
+.pwtest input{flex:1;font-family:var(--mono);padding:11px;border-radius:10px;background:#02110c;border:1px solid var(--line);color:var(--term)}
+.strength{margin-top:10px;font-weight:700}
+.sbar{height:12px;border-radius:999px;background:#02110c;border:1px solid var(--line);overflow:hidden;margin-top:6px}
+.sbar>div{height:100%;width:0;transition:.3s}
+/* encryption teaser */
+.locked{position:relative;background:#0b1713;border:1px dashed var(--line);border-radius:16px;padding:26px;text-align:center}
+.locked .enc{font-family:var(--mono);color:var(--muted);font-size:1.1rem;word-break:break-all;line-height:1.9;filter:blur(.4px)}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#02110c;border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-family:var(--mono);color:var(--amber)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) scale(.85);background:#02110c;border:1px solid var(--term);color:var(--term);
+  font-family:var(--mono);font-weight:700;padding:12px 24px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+.hdr-ico{font-size:2.3rem}
+@media (max-width:780px){
+  .grid2,.cracker{grid-template-columns:1fr}
+  .steps{display:none}.card{padding:18px}
+}
+</style>
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">root@technoda:~<span class="blink">█</span></div>
+    <div class="steps" id="steps">
+      <span class="chip" data-s="intro">0. תדריך</span>
+      <span class="chip" data-s="story">1. תיק החקירה</span>
+      <span class="chip" data-s="clues">2. איסוף מודיעין</span>
+      <span class="chip" data-s="crack">3. Brute Force</span>
+      <span class="chip" data-s="done">4. פענוח + הגנה</span>
+    </div>
+    <button class="icon-btn" id="soundBtn" title="צליל">🔊</button>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active" id="intro">
+    <div class="card">
+      <div class="hdr-ico">🕵️‍♂️💻</div>
+      <h1 class="term-title">מבצע חדירה</h1>
+      <p class="lead">ברוכים הבאים ליחידת הסייבר. היום תלמדו את אחת השיטות המפורסמות של האקרים: <b>Brute Force</b> (כוח גס) — ניחוש סיסמה על ידי ניסיון של אלפי אפשרויות במהירות.</p>
+      <div class="boot" id="boot"></div>
+      <div class="mission" id="missionBox" style="display:none">
+        🎯 <b>המשימה שלכם, האקרים אתיים:</b><br>
+        1️⃣ לקרוא את תיק החקירה על <b>"מר שמוליק"</b> ולאסוף עליו מידע אישי.<br>
+        2️⃣ להזין את המידע ל<b>מחולל הסיסמאות</b>.<br>
+        3️⃣ להריץ Brute Force ולפרוץ לחשבון שלו.<br>
+        4️⃣ לגלות <b>איך מגינים</b> על עצמנו מהשיטה הזו!<br><br>
+        ⚠️ <b>חוקי היחידה:</b> אנחנו האקרים <b>"כובע לבן"</b> — לומדים לפרוץ כדי <b>להגן</b>. השיטה כאן עובדת רק על דמות דמיונית במשחק, ולעולם לא על חשבון אמיתי של מישהו.
+      </div>
+      <div class="center"><button class="big-btn" id="toStory" style="display:none">קיבלתי. מתחילים 🚀</button></div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="screen" id="story">
+    <div class="card">
+      <h2 class="term-title">📁 תיק חקירה #4471 — מטרה: "מר שמוליק"</h2>
+      <p class="lead">סוכנים, אספנו מהרשתות החברתיות של המטרה את הפרופיל הבא. קראו אותו היטב — כל <span class="clue" title="רמז!">מילה מודגשת בצהוב</span> היא פרט שיכול להסתתר בסיסמה שלו.</p>
+      <div class="folder-tab">PROFILE.txt</div>
+      <div class="dossier" id="dossier"></div>
+      <p class="hint-tip">💡 טיפ: רחפו עם העכבר מעל מילה מודגשת (או געו בה) כדי לראות איזה סוג מידע היא.</p>
+      <div class="center" style="margin-top:16px"><button class="big-btn" id="toClues">אספתי את המידע ← להמשך</button></div>
+    </div>
+  </section>
+
+  <!-- CLUES -->
+  <section class="screen" id="clues">
+    <div class="card">
+      <h2 class="term-title">🧩 שלב 2 — איסוף מודיעין</h2>
+      <p class="lead">מלאו את הפרטים שגיליתם על מר שמוליק מתוך התיק. המחולל ישתמש בהם כדי לבנות ניחושים. (אל תדאגו לטעויות קטנות — אפשר לתקן.)</p>
+      <div class="grid2" id="clueFields"></div>
+      <div>
+        <div style="font-weight:700;margin:16px 0 4px;color:#bfe9d4">מה להוסיף לכל מילה? (ככה האקרים מגדילים את מספר הניחושים)</div>
+        <div class="toggle-row">
+          <label class="toggle"><input type="checkbox" id="optCap" checked> אות גדולה בהתחלה (Luna)</label>
+          <label class="toggle"><input type="checkbox" id="optYears" checked> שנים (2011, 2012…)</label>
+          <label class="toggle"><input type="checkbox" id="optCombo" checked> צירוף של 2 מילים</label>
+          <label class="toggle"><input type="checkbox" id="optLeet"> החלפת אותיות (a→@, o→0)</label>
+        </div>
+      </div>
+      <div class="center" style="margin-top:18px">
+        <button class="big-btn blue" id="toCrack">בניתי את הרשימה ← למחולל ⚡</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRACK -->
+  <section class="screen" id="crack">
+    <div class="card">
+      <h2 class="term-title">⚡ שלב 3 — מחולל הסיסמאות (Brute Force)</h2>
+      <p class="lead">המחולל בנה <b id="comboCount">0</b> ניחושים מהמידע שהזנתם. לחצו <b>הפעל</b> וצפו במחשב מנסה אותם אחד אחרי השני — בדיוק כמו האקר אמיתי.</p>
+      <div class="cracker">
+        <div class="screen-main">
+          <div class="feed" id="feed"></div>
+          <div class="gauge">
+            <div class="bar"><div id="bar"></div></div>
+            <div class="stat"><span id="progTxt">מוכן להפעלה</span><span id="speedTxt"></span></div>
+          </div>
+          <div class="manual">
+            <input id="manualPw" placeholder="רוצים לנחש לבד? כתבו ניחוש ולחצו Enter" dir="ltr">
+            <button class="ghost-btn" id="manualBtn">נסה</button>
+          </div>
+        </div>
+        <div class="sidestat">
+          <div class="stat-box"><div class="n" id="triedN">0</div><div class="l">ניחושים שנוסו</div></div>
+          <div class="stat-box"><div class="n" id="comboN">0</div><div class="l">סה״כ ברשימה</div></div>
+          <button class="big-btn" id="runBtn">▶ הפעל Brute Force</button>
+          <button class="ghost-btn" id="turboBtn">⏩ מהיר יותר</button>
+          <div class="combo-list" id="comboList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section class="screen" id="done">
+    <div class="card center">
+      <div class="hdr-ico">🔓✅</div>
+      <h2 class="term-title">פרצנו! הסיסמה נמצאה</h2>
+      <div class="cracked-pw" id="foundPw">********</div>
+      <div class="mono" id="foundMeta" style="color:var(--muted)"></div>
+      <div class="lesson" style="text-align:right">
+        🎯 <b>איך זה קרה כל כך מהר?</b><br>
+        הסיסמה של מר שמוליק הייתה בנויה מ<b>מידע אישי</b> שכולם יכולים למצוא עליו ברשת: שם חיית המחמד ושנת הלידה. המחשב ניסה את כל הצירופים של המידע הזה תוך שניות ומצא אותה. <br>
+        מחשב אמיתי יכול לנסות <b>מיליוני</b> ניחושים בשנייה אחת!
+      </div>
+      <div class="recipe" style="text-align:right">
+        🛡️ <b>איך בונים סיסמה שקשה לפרוץ?</b> 3 מילים אקראיות <b>שלא קשורות אליכם</b> + מספר + סימן.<br>
+        דוגמה: <span class="mono" style="color:var(--amber)">Ananas!Pingvin42Gitara</span><br>
+        בדקו למטה כמה זמן ייקח למחשב לפרוץ סיסמאות שונות 👇
+        <div class="pwtest">
+          <input id="pwInput" placeholder="הקלידו סיסמה לדוגמה (לא אמיתית!)" dir="ltr">
+        </div>
+        <div class="strength" id="strTxt"></div>
+        <div class="sbar"><div id="sBar"></div></div>
+      </div>
+
+      <!-- ENCRYPTION SLOT -->
+      <div class="locked" style="text-align:right;margin-top:20px">
+        <div class="badge">🔐 שלב מוצפן — נעול</div>
+        <h3 class="term-title" style="margin-top:10px">רגע… מצאנו קובץ מוצפן בחשבון של מר שמוליק!</h3>
+        <p style="color:#bfe9d4;line-height:1.8">בתוך החשבון שפרצנו יש הודעה סודית, אבל היא <b>מוצפנת</b> — מעורבבת בקוד סודי שאי אפשר לקרוא. כדי לפענח אותה צריך ללמוד <b>הצפנות</b>.</p>
+        <div class="enc" id="encPreview"></div>
+        <div class="center" style="margin-top:16px">
+          <a id="cryptLink" href="../crypt/"><button class="big-btn blue">🔓 למעבדת ההצפנות ←</button></a>
+        </div>
+        <p class="hint-tip center">(המדריך/ה ייתן/תתן את הקישור. אם הכפתור לא עובד, היכנסו לפעילות "crypt".)</p>
+      </div>
+
+      <div style="margin-top:20px">
+        <button class="ghost-btn" id="againBtn">🔄 לנסות שוב עם סיסמה אחרת</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const state={sound:true};
+
+/* ===== target (fictional) ===== */
+const TARGET={pw:"luna2011", pet:"luna", year:"2011", name:"שמוליק"};
+
+/* ===== matrix rain ===== */
+(function(){
+  const cv=$("#rain"), cx=cv.getContext("2d"); let cols,drops;
+  function reset(){cv.width=innerWidth;cv.height=innerHeight;cols=Math.floor(cv.width/14);drops=Array(cols).fill(0)}
+  reset(); addEventListener("resize",reset);
+  const ch="01<>[]{}#$%&*ABCDEF".split("");
+  setInterval(()=>{cx.fillStyle="rgba(3,10,8,.09)";cx.fillRect(0,0,cv.width,cv.height);
+    cx.fillStyle="#00ff88";cx.font="13px monospace";
+    drops.forEach((y,i)=>{cx.fillText(ch[Math.random()*ch.length|0],i*14,y*14);
+      drops[i]=(y*14>cv.height&&Math.random()>.975)?0:y+1})},70);
+})();
+
+/* ===== sound ===== */
+let actx;
+function beep(freqs,dur=.07,type="square",vol=.12){
+  if(!state.sound)return;
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;
+      o.connect(g);g.connect(actx.destination);const t=actx.currentTime+i*dur;
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.start(t);o.stop(t+dur+.02)})}catch(e){}
+}
+const sTick=()=>beep([320],.03,"square",.05), sHit=()=>beep([700,1046,1318],.12,"square",.16),
+      sBad=()=>beep([200,150],.12,"sawtooth",.12), sType=()=>beep([520],.02,"square",.04);
+$("#soundBtn").onclick=()=>{state.sound=!state.sound;$("#soundBtn").textContent=state.sound?"🔊":"🔇"};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1300)}
+
+/* ===== nav ===== */
+const ORDER=["intro","story","clues","crack","done"];
+function show(id){
+  $$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
+  const i=ORDER.indexOf(id);
+  $$("#steps .chip").forEach(c=>{const k=ORDER.indexOf(c.dataset.s);c.classList.toggle("on",k===i);c.classList.toggle("done",k<i)});
+  scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ===== intro boot ===== */
+const BOOT=[
+  ["[ OK ] אתחול מסוף יחידת הסייבר...","q"],
+  ["[ OK ] טעינת כלי Brute Force v2.4","q"],
+  ["[ !! ] אותר יעד: מר שמוליק","w"],
+  ["[ .. ] סורק רשתות חברתיות של היעד...",""],
+  ["[ OK ] נאסף מידע אישי זמין לכולם","q"],
+  ["[ >> ] ממתין לפקודת האקר...","w"],
+];
+function runBoot(){
+  const el=$("#boot"); let i=0; el.textContent="";
+  (function next(){
+    if(i>=BOOT.length){$("#missionBox").style.display="block";$("#toStory").style.display="inline-block";return}
+    const [txt,cls]=BOOT[i++]; const span=document.createElement("span");
+    if(cls)span.className=cls; span.textContent=txt+"\n"; el.appendChild(span); sTick();
+    setTimeout(next,480);
+  })();
+}
+runBoot();
+$("#toStory").onclick=()=>{beep([440,660]);show("story")};
+
+/* ===== story ===== */
+const STORY=[
+  ["היי! קוראים לי ", null],["שמוליק", "שם פרטי"],[" ואני בן ", null],["11", "גיל"],
+  [". נולדתי בשנת ", null],["2011", "שנת לידה"],[". אני גר ב", null],["חיפה", "עיר מגורים"],
+  [". הכי אוהב בעולם את הכלבה שלי, ", null],["לונה", "שם חיית מחמד 🐶"],
+  [" — היא הכי חמודה! בזמן הפנוי אני משחק ", null],["כדורסל", "תחביב"],
+  [" ואוהד את קבוצת ", null],["מכבי", "קבוצה אהודה"],
+  [". המאכל האהוב עליי הוא ", null],["פיצה", "מאכל אהוב"],
+  [". וזהו, זה אני!", null],
+];
+function buildStory(){
+  const d=$("#dossier"); d.innerHTML="";
+  const p=document.createElement("p");
+  STORY.forEach(([txt,kind])=>{
+    if(kind){const s=document.createElement("span");s.className="clue";s.textContent=txt;s.title="סוג מידע: "+kind;p.appendChild(s)}
+    else p.appendChild(document.createTextNode(txt));
+  });
+  d.appendChild(p);
+}
+buildStory();
+$("#toClues").onclick=()=>{beep([440,660]);show("clues");renderClues()};
+
+/* ===== clue fields ===== */
+const FIELDS=[
+  {k:"pet",label:"🐶 שם חיית המחמד",ex:"לדוגמה מהסיפור: לונה"},
+  {k:"name",label:"🙂 שם פרטי",ex:"שמוליק"},
+  {k:"year",label:"📅 שנת לידה",ex:"2011"},
+  {k:"hobby",label:"⚽ תחביב",ex:"כדורסל"},
+  {k:"city",label:"🏙️ עיר",ex:"חיפה"},
+  {k:"team",label:"🏀 קבוצה אהודה",ex:"מכבי"},
+];
+let rendered=false;
+function renderClues(){
+  if(rendered)return; rendered=true;
+  const box=$("#clueFields");
+  FIELDS.forEach(f=>{
+    const d=document.createElement("div");d.className="field";
+    d.innerHTML=`<label>${f.label}</label><input id="c_${f.k}" dir="auto" autocomplete="off" placeholder="הקלידו כאן..."><div class="ex">${f.ex}</div>`;
+    box.appendChild(d);
+  });
+}
+$("#toCrack").onclick=()=>{
+  const vals=FIELDS.map(f=>($("#c_"+f.k).value||"").trim()).filter(Boolean);
+  if(vals.length<2){toast("מלאו לפחות 2 פרטים מהסיפור");sBad();return}
+  beep([440,660]); buildCombos(); show("crack"); setupCrack();
+};
+
+/* ===== combo generation (transliteration of Hebrew clues) ===== */
+const HEB={'א':'','ב':'b','ג':'g','ד':'d','ה':'h','ו':'o','ז':'z','ח':'ch','ט':'t','י':'i','כ':'k','ך':'k',
+  'ל':'l','מ':'m','ם':'m','נ':'n','ן':'n','ס':'s','ע':'','פ':'p','ף':'f','צ':'ts','ץ':'ts','ק':'k','ר':'r','ש':'sh','ת':'t',
+  ' ':'','-':'','"':'','\'':''};
+const MAP={'לונה':'luna','שמוליק':'shmulik','כדורסל':'basketball','חיפה':'haifa','מכבי':'maccabi','פיצה':'pizza',
+  'כדורגל':'football','תל אביב':'telaviv','ירושלים':'jerusalem'};
+function translit(s){
+  s=s.trim(); if(MAP[s])return MAP[s];
+  if(/^[a-zA-Z0-9]+$/.test(s))return s.toLowerCase();
+  let o="";for(const ch of s)o+=(HEB[ch]!==undefined?HEB[ch]:ch);
+  return o.toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+let COMBOS=[];
+function leet(w){return w.replace(/a/g,"@").replace(/o/g,"0").replace(/e/g,"3").replace(/i/g,"1")}
+function buildCombos(){
+  const raw=FIELDS.map(f=>($("#c_"+f.k).value||"").trim()).filter(Boolean);
+  const words=[...new Set(raw.map(translit).filter(Boolean))];
+  const cap=$("#optCap").checked, useYears=$("#optYears").checked, combo=$("#optCombo").checked, useLeet=$("#optLeet").checked;
+  const base=new Set();
+  const years=[]; if(useYears){for(let y=2008;y<=2015;y++)years.push(y); years.push(123,1234,2023,2024)}
+  words.forEach(w=>{
+    const forms=new Set([w]); if(cap)forms.add(w[0].toUpperCase()+w.slice(1));
+    forms.forEach(fw=>{
+      base.add(fw);
+      years.forEach(y=>base.add(fw+y));
+      if(useLeet)base.add(leet(fw));
+    });
+  });
+  if(combo){
+    for(const a of words)for(const b of words)if(a!==b){
+      base.add(a+b);
+      if(cap)base.add(a[0].toUpperCase()+a.slice(1)+b);
+    }
+  }
+  // guarantee target reachable only if its parts were entered
+  COMBOS=[...base];
+  // shuffle but remember target index
+  for(let i=COMBOS.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[COMBOS[i],COMBOS[j]]=[COMBOS[j],COMBOS[i]]}
+}
+
+/* ===== cracking animation ===== */
+let crackState;
+function setupCrack(){
+  crackState={running:false,idx:0,found:false,delay:70};
+  $("#comboCount").textContent=COMBOS.length;
+  $("#comboN").textContent=COMBOS.length; $("#triedN").textContent=0;
+  $("#bar").style.width="0"; $("#progTxt").textContent="מוכן להפעלה"; $("#speedTxt").textContent="";
+  $("#feed").innerHTML=""; $("#runBtn").disabled=false;
+  const cl=$("#comboList"); cl.textContent=COMBOS.slice(0,120).join("  ");
+}
+function step(){
+  if(!crackState.running||crackState.found)return;
+  const batch=crackState.delay<30?6:1;
+  for(let b=0;b<batch;b++){
+    if(crackState.idx>=COMBOS.length){ // ran out without hit (shouldn't happen if target included)
+      crackState.running=false;$("#progTxt").textContent="לא נמצאה סיסמה — נסו להוסיף פרטים";sBad();return;
+    }
+    const guess=COMBOS[crackState.idx++];
+    const line=document.createElement("div");
+    const hit=(guess.toLowerCase()===TARGET.pw);
+    line.className="try"; line.textContent="try > "+guess;
+    const feed=$("#feed"); feed.insertBefore(line,feed.firstChild);
+    while(feed.children.length>14)feed.removeChild(feed.lastChild);
+    $("#triedN").textContent=crackState.idx;
+    const pct=Math.round(crackState.idx/COMBOS.length*100);
+    $("#bar").style.width=pct+"%"; $("#progTxt").textContent="סורק... "+pct+"%";
+    $("#speedTxt").textContent=(crackState.delay<30?"מצב מהיר ⏩":"")+"";
+    if(hit){
+      line.className=""; line.innerHTML='<span class="hit">✔ MATCH: '+guess+'</span>';
+      crackState.found=true;crackState.running=false; sHit();
+      $("#progTxt").textContent="נפרץ! ✔"; $("#bar").style.width="100%";
+      setTimeout(()=>finishCrack(guess),900); return;
+    } else if(b===0) sType();
+  }
+  setTimeout(step,crackState.delay);
+}
+$("#runBtn").onclick=()=>{
+  if(crackState.running)return;
+  if(!COMBOS.some(c=>c.toLowerCase()===TARGET.pw)){
+    toast("חסר מידע! חזרו ובדקו ששם חיית המחמד ושנת הלידה מולאו");sBad();show("clues");return;
+  }
+  crackState.running=true;$("#runBtn").disabled=true;beep([330,440]);step();
+};
+$("#turboBtn").onclick=()=>{crackState.delay=crackState.delay<30?70:12;toast(crackState.delay<30?"מצב מהיר ⏩":"מהירות רגילה")};
+$("#manualBtn").onclick=tryManual;
+$("#manualPw").addEventListener("keydown",e=>{if(e.key==="Enter")tryManual()});
+function tryManual(){
+  const v=$("#manualPw").value.trim().toLowerCase(); if(!v)return;
+  if(v===TARGET.pw){sHit();finishCrack($("#manualPw").value.trim())}
+  else{sBad();toast("❌ לא נכון — תנו למחשב לנסות!");$("#manualPw").value=""}
+}
+function finishCrack(pw){
+  $("#foundPw").textContent=pw;
+  $("#foundMeta").textContent=`= "${TARGET.pet}" (חיית המחמד) + ${TARGET.year} (שנת הלידה)`;
+  show("done"); buildEnc();
+}
+
+/* ===== password strength tester ===== */
+$("#pwInput").addEventListener("input",e=>{
+  const pw=e.target.value; const sec=estimate(pw);
+  const bar=$("#sBar"), t=$("#strTxt");
+  let pct,col,label;
+  if(!pw){pct=0;col="#333";label=""}
+  else if(sec<1){pct=20;col="#ff4d5e";label="🔴 חלשה מאוד — נפרצת מיד"}
+  else if(sec<3600){pct=40;col="#ff9f1c";label="🟠 חלשה — נפרצת בדקות"}
+  else if(sec<3.15e10){pct=65;col="#ffcf3f";label="🟡 בינונית"}
+  else if(sec<3.15e16){pct=85;col="#39d0ff";label="🔵 חזקה — שנים רבות"}
+  else{pct=100;col="#00ff88";label="🟢 חזקה מאוד — מיליוני שנים!"}
+  bar.style.width=pct+"%";bar.style.background=col;t.textContent=label;t.style.color=col;
+});
+function estimate(pw){
+  if(!pw)return 0;
+  let pool=0; if(/[a-z]/.test(pw))pool+=26; if(/[A-Z]/.test(pw))pool+=26;
+  if(/[0-9]/.test(pw))pool+=10; if(/[^a-zA-Z0-9]/.test(pw))pool+=30;
+  const guesses=Math.pow(pool||1,pw.length)/2;
+  return guesses/1e10; // seconds at 10B/s
+}
+
+/* ===== encryption preview (just scrambled look) ===== */
+function buildEnc(){
+  const msg="הכסף הוחבא בכספת שמספרה"; let out="";
+  for(const ch of msg){ if(ch===' '){out+=' ';continue}
+    out+=String.fromCharCode(0x5D0+((Math.random()*22)|0)); }
+  $("#encPreview").textContent="🔒 "+out+" ???";
+}
+$("#againBtn").onclick=()=>{FIELDS.forEach(f=>$("#c_"+f.k).value="");rendered=true;show("story")};
+</script>
+</body>
+</html>
