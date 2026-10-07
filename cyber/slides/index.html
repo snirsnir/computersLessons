@@ -30,6 +30,7 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
 .grad{background:linear-gradient(90deg,var(--p2),var(--p1),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
 .kicker{font-family:var(--mono);letter-spacing:3px;font-size:clamp(.9rem,2.5vw,1.3rem);color:var(--p2);text-transform:uppercase}
 .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:3vh 4vw;backdrop-filter:blur(4px);max-width:min(90vw,980px)}
+.row.trio{gap:14px}.row.trio .card{padding:2.2vh 2vw;max-width:min(30vw,300px)}.row.trio .card .big-emo{font-size:clamp(2.8rem,8vw,5rem)}.row.trio .card p{font-size:clamp(.95rem,2.4vw,1.4rem)}
 .float{animation:float 3s ease-in-out infinite}@keyframes float{50%{transform:translateY(-14px)}}
 .spin{animation:spin 10s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .wobble{animation:wobble 1.6s ease-in-out infinite}@keyframes wobble{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
@@ -129,7 +130,7 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
   <!-- 2 three topics -->
   <section class="slide" data-sec="פתיחה">
     <h2>3 הנושאים של היום</h2>
-    <div class="row" style="margin-top:24px">
+    <div class="row trio" style="margin-top:24px">
       <div class="card step"><div class="big-emo">🎣</div><h3>פישינג</h3><p>הונאות שמנסות לדוג אותנו</p></div>
       <div class="card step"><div class="big-emo">🔨</div><h3>Brute Force</h3><p>איך פורצים סיסמאות</p></div>
       <div class="card step"><div class="big-emo">🔐</div><h3>הצפנות</h3><p>שפה סודית למחשבים</p></div>
@@ -284,7 +285,7 @@ p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
   <!-- ===== CLOSING ===== -->
   <section class="slide" data-sec="סיכום 🏅">
     <h2>מה למדנו היום? 🧠</h2>
-    <div class="row" style="margin-top:20px">
+    <div class="row trio" style="margin-top:20px">
       <div class="card step"><div class="big-emo">🎣</div><h3>פישינג</h3><p>עוצרים, חושבים, שואלים</p></div>
       <div class="card step"><div class="big-emo">🔨</div><h3>Brute Force</h3><p>סיסמה חזקה ולא אישית</p></div>
       <div class="card step"><div class="big-emo">🔐</div><h3>הצפנות</h3><p>שומרים על המפתח</p></div>
