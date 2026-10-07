@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>עולם הסייבר – מצגת לכיתה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#0a0618; --bg1:#141033; --ink:#f3f0ff; --muted:#b9b0e6;
+  --p1:#7b2ff7; --p2:#00d4ff; --green:#2bff9b; --gold:#ffcf3f; --red:#ff5d73; --pink:#ff5fb0;
+  --mono:"Share Tech Mono",monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:"Rubik",system-ui,Arial,sans-serif;color:var(--ink);background:#000}
+.stage{position:fixed;inset:0;overflow:hidden}
+.bg{position:absolute;inset:0;z-index:0;transition:background .8s ease}
+#rain{position:absolute;inset:0;z-index:0;opacity:.12}
+.slide{position:absolute;inset:0;z-index:2;display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:4vh 6vw 92px;opacity:0;transform:scale(.98)}
+.slide.on{display:flex;animation:pop .5s ease forwards}
+@keyframes pop{to{opacity:1;transform:scale(1)}}
+h1{font-size:clamp(2.2rem,7vw,5rem);font-weight:900;margin:.1em 0;line-height:1.1}
+h2{font-size:clamp(1.8rem,5.5vw,3.6rem);font-weight:900;margin:.1em 0;line-height:1.15}
+h3{font-size:clamp(1.3rem,3.5vw,2.2rem);font-weight:700;margin:.2em 0}
+p{font-size:clamp(1.1rem,3vw,2rem);line-height:1.5;margin:.3em 0;max-width:22ch}
+.big-emo{font-size:clamp(4rem,16vw,11rem);line-height:1;filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+.grad{background:linear-gradient(90deg,var(--p2),var(--p1),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kicker{font-family:var(--mono);letter-spacing:3px;font-size:clamp(.9rem,2.5vw,1.3rem);color:var(--p2);text-transform:uppercase}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:3vh 4vw;backdrop-filter:blur(4px);max-width:min(90vw,980px)}
+.float{animation:float 3s ease-in-out infinite}@keyframes float{50%{transform:translateY(-14px)}}
+.spin{animation:spin 10s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.wobble{animation:wobble 1.6s ease-in-out infinite}@keyframes wobble{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+/* step reveal */
+.step{opacity:0;transform:translateY(22px);transition:opacity .5s,transform .5s;pointer-events:none}
+.step.show{opacity:1;transform:none;pointer-events:auto}
+/* fishing scene */
+.pond{position:relative;width:min(80vw,620px);height:38vh;min-height:230px;background:linear-gradient(180deg,#0b2e4a,#0a4a6e);border-radius:24px;overflow:hidden;border:2px solid rgba(255,255,255,.1)}
+.wave{position:absolute;left:0;right:0;top:34%;height:3px;background:rgba(255,255,255,.25);border-radius:50%;box-shadow:0 14px 0 rgba(255,255,255,.12),0 28px 0 rgba(255,255,255,.08)}
+.hook{position:absolute;left:50%;top:-4%;font-size:3rem;transform:translateX(-50%);transition:top 1s ease}
+.hook.drop{top:52%}
+.fish{position:absolute;font-size:2.6rem;transition:all .9s ease}
+.bait-label{position:absolute;left:50%;transform:translateX(-50%);top:8%;background:var(--gold);color:#3a2a00;font-weight:900;
+  padding:6px 16px;border-radius:999px;font-size:clamp(.9rem,2.4vw,1.4rem);white-space:nowrap}
+/* warning signs list */
+.signs{display:grid;gap:14px;width:min(92vw,860px);text-align:right}
+.sign{display:flex;align-items:center;gap:16px;background:rgba(255,93,115,.12);border:1px solid rgba(255,93,115,.4);
+  border-radius:16px;padding:14px 20px;font-size:clamp(1.05rem,3vw,1.7rem);font-weight:700}
+.sign .n{font-size:clamp(1.6rem,5vw,2.6rem)}
+/* fake message bubble (clearly illustrative) */
+.fakemsg{position:relative;background:#fff;color:#111;border-radius:18px;padding:20px 24px;max-width:min(88vw,620px);
+  text-align:right;font-size:clamp(1.05rem,3vw,1.6rem);line-height:1.5;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.fakemsg .stamp{position:absolute;top:-16px;left:-10px;background:var(--red);color:#fff;font-weight:900;
+  padding:6px 16px;border-radius:999px;transform:rotate(-8deg);font-size:clamp(.85rem,2.3vw,1.2rem)}
+.fakemsg .bad{background:#ffe3e3;border-bottom:3px wavy var(--red);border-radius:4px;padding:0 4px;font-weight:900;color:#c92a2a}
+/* counter */
+.counter{font-family:var(--mono);font-size:clamp(2.4rem,12vw,8rem);font-weight:700;color:var(--green);
+  text-shadow:0 0 24px rgba(43,255,155,.5)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:min(92vw,900px)}
+.pwbox{border-radius:20px;padding:20px;border:2px solid}
+.pwbox.weak{background:rgba(255,93,115,.1);border-color:var(--red)}
+.pwbox.strong{background:rgba(43,255,155,.1);border-color:var(--green)}
+.pwbox .pw{font-family:var(--mono);font-size:clamp(1.1rem,3.3vw,2rem);font-weight:700;word-break:break-all}
+.pwbox .time{font-size:clamp(1.3rem,4vw,2.4rem);font-weight:900;margin-top:10px}
+.pwbox.weak .time{color:var(--red)} .pwbox.strong .time{color:var(--green)}
+.recipe-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;font-size:clamp(1.1rem,3vw,1.8rem);font-weight:700}
+.ing{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 18px}
+/* cipher wheel */
+.wheelwrap{position:relative;width:min(62vw,350px);height:min(62vw,350px)}
+.ring{position:absolute;inset:0;border-radius:50%}
+.ring .l{position:absolute;left:50%;top:50%;font-weight:900;font-size:clamp(.8rem,2.6vw,1.3rem);transform-origin:0 0}
+.ring.outer .l{color:var(--p2)} .ring.inner .l{color:var(--gold)}
+.ring.inner{transition:transform .5s cubic-bezier(.4,1.4,.5,1)}
+.wheel-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(1.6rem,6vw,3rem)}
+.decode-box{font-family:var(--mono);font-size:clamp(1.4rem,5vw,3rem);letter-spacing:4px;font-weight:700;margin-top:10px}
+.decode-box .c{display:inline-block;color:var(--muted)} .decode-box .c.done{color:var(--green);transform:scale(1.15)}
+/* hud */
+.hud{position:fixed;z-index:30;bottom:16px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:14px;pointer-events:none}
+.hud button{pointer-events:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;
+  width:52px;height:52px;border-radius:50%;font-size:1.4rem;cursor:pointer;transition:.15s}
+.hud button:hover{background:rgba(255,255,255,.22);transform:scale(1.08)}
+.progress{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--p2),var(--p1));z-index:30;transition:width .3s}
+.dots{position:fixed;z-index:30;bottom:24px;right:20px;max-width:40vw;flex-wrap:wrap;justify-content:flex-end;display:flex;gap:6px;pointer-events:none}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}
+.dots .d.on{background:var(--gold);transform:scale(1.4)}
+.sec-badge{position:fixed;z-index:30;top:14px;right:20px;font-family:var(--mono);font-size:clamp(.8rem,2vw,1.1rem);
+  color:var(--muted);background:rgba(0,0,0,.3);padding:6px 14px;border-radius:999px}
+.hint-tap{position:fixed;z-index:30;bottom:80px;left:0;right:0;text-align:center;color:var(--muted);font-size:.95rem;pointer-events:none;animation:fadepulse 2.5s ease-in-out infinite}
+@keyframes fadepulse{50%{opacity:.4}}
+.tapbtn{background:linear-gradient(135deg,var(--p1),var(--p2));border:0;color:#fff;font-family:inherit;font-weight:900;
+  font-size:clamp(1.1rem,3.3vw,1.7rem);padding:14px 30px;border-radius:999px;cursor:pointer;box-shadow:0 8px 24px rgba(123,47,247,.5)}
+.tapbtn.gold{background:linear-gradient(135deg,#ffb020,var(--gold));color:#3a2a00}
+.slider{width:min(80vw,420px);accent-color:var(--gold)}
+#confetti{position:fixed;inset:0;z-index:25;pointer-events:none}
+.mono{font-family:var(--mono)}
+.row{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;align-items:center}
+.pill{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:8px 20px;font-weight:700;font-size:clamp(1rem,2.8vw,1.5rem);margin:4px}
+.white-hat{color:var(--green)} .black-hat{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<div class="sec-badge" id="secBadge"></div>
+<div class="stage">
+  <div class="bg" id="bg"></div>
+  <canvas id="rain"></canvas>
+
+  <!-- 0 INTRO -->
+  <section class="slide" data-sec="פתיחה">
+    <div class="kicker">TECHNODA · CYBER</div>
+    <div class="big-emo float">🕵️‍♂️💻</div>
+    <h1 class="grad">עולם הסייבר</h1>
+    <p>היום נהיה <b>האקרים טובים</b> ונלמד להגן על עצמנו ברשת!</p>
+    <div class="step" style="margin-top:20px"><button class="tapbtn" data-next>יוצאים לדרך 🚀</button></div>
+  </section>
+
+  <!-- 1 white/black hat -->
+  <section class="slide" data-sec="פתיחה">
+    <h2>יש שני סוגי האקרים 🎩</h2>
+    <div class="row" style="margin-top:20px">
+      <div class="card step"><div class="big-emo">😈</div><h3 class="black-hat">כובע שחור</h3><p>פורץ כדי <b>לגנוב ולהזיק</b>. זה פשע!</p></div>
+      <div class="card step"><div class="big-emo">😇</div><h3 class="white-hat">כובע לבן</h3><p>פורץ כדי <b>להגן ולתקן</b>. תמיד ברשות!</p></div>
+    </div>
+    <p class="step" style="margin-top:18px;max-width:30ch">היום כולנו <b class="white-hat">כובע לבן</b> — לומדים לפרוץ כדי לדעת איך מתגוננים. 🛡️</p>
+  </section>
+
+  <!-- 2 three topics -->
+  <section class="slide" data-sec="פתיחה">
+    <h2>3 הנושאים של היום</h2>
+    <div class="row" style="margin-top:24px">
+      <div class="card step"><div class="big-emo">🎣</div><h3>פישינג</h3><p>הונאות שמנסות לדוג אותנו</p></div>
+      <div class="card step"><div class="big-emo">🔨</div><h3>Brute Force</h3><p>איך פורצים סיסמאות</p></div>
+      <div class="card step"><div class="big-emo">🔐</div><h3>הצפנות</h3><p>שפה סודית למחשבים</p></div>
+    </div>
+  </section>
+
+  <!-- ===== PART 1: PHISHING ===== -->
+  <section class="slide" data-sec="פישינג 🎣">
+    <div class="kicker">נושא 1</div>
+    <div class="big-emo wobble">🎣</div>
+    <h1 class="grad">פישינג</h1>
+    <p>או בעברית: <b>דיג</b></p>
+  </section>
+
+  <section class="slide" data-sec="פישינג 🎣">
+    <h2>למה "דיג"? 🐟</h2>
+    <div class="pond" id="pond" style="margin:20px 0">
+      <div class="wave"></div>
+      <div class="bait-label step" id="baitLabel">🎁 "זכית בפרס!"</div>
+      <div class="hook" id="hook">🪝</div>
+      <div class="fish" id="fish" style="left:20%;top:60%">🐠</div>
+      <div class="fish" style="left:70%;top:72%">🐟</div>
+    </div>
+    <p class="step">ההאקר זורק <b>פיתיון</b> מפתה, ומחכה שמישהו יינעל על הקרס.</p>
+    <div class="step"><button class="tapbtn" id="castBtn">זרוק את הפיתיון! 🎣</button></div>
+  </section>
+
+  <section class="slide" data-sec="פישינג 🎣">
+    <h2>ככה נראית הודעת פישינג 👇</h2>
+    <p style="font-size:clamp(.9rem,2.5vw,1.3rem);color:var(--muted)">(דוגמה להמחשה — <b>לא</b> הודעה אמיתית!)</p>
+    <div class="fakemsg step">
+      <div class="stamp">🚨 פישינג!</div>
+      <div><span class="bad">מזל טוב!!!</span> זכית ב־<span class="bad">1,000,000 ₪</span>! 🎉<br>
+      <span class="bad">רק היום</span> — לחץ כאן ומלא את הפרטים שלך:<br>
+      <span class="bad">www.pr1zes-win.co/??</span></div>
+    </div>
+    <p class="step" style="margin-top:20px">נראה מפתה… אבל מלא <b class="grad">סימני אזהרה</b>. בואו נלמד לזהות אותם!</p>
+  </section>
+
+  <section class="slide" data-sec="פישינג 🎣">
+    <h2>🚩 5 סימני האזהרה</h2>
+    <div class="signs">
+      <div class="sign step"><span class="n">🏃</span><div><b>לחץ ודחיפות</b> — "רק היום!", "ייחסם תוך שעה!"</div></div>
+      <div class="sign step"><span class="n">🎁</span><div><b>הבטחה מפתה מדי</b> — "זכית באייפון!", "קיבלת כסף!"</div></div>
+      <div class="sign step"><span class="n">🔗</span><div><b>קישור מוזר</b> — כתובת עם שגיאות (g00gle) או מקוצרת</div></div>
+      <div class="sign step"><span class="n">🔑</span><div><b>בקשת סודות</b> — סיסמה, קוד, מספר כרטיס אשראי</div></div>
+      <div class="sign step"><span class="n">✍️</span><div><b>שגיאות כתיב</b> ופנייה כללית — "לקוח יקר" במקום השם שלך</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-sec="פישינג 🎣">
+    <div class="big-emo step">🛑</div>
+    <h2 class="step">מה עושים?</h2>
+    <h1 class="grad step" style="font-size:clamp(1.8rem,6vw,4rem)">עוצרים · חושבים · שואלים מבוגר</h1>
+    <p class="step">אף פעם לא לוחצים על קישור בהודעה מלחיצה. נכנסים לאתר בעצמנו! 👍</p>
+  </section>
+
+  <!-- ===== PART 2: BRUTE FORCE ===== -->
+  <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
+    <div class="kicker">נושא 2</div>
+    <div class="big-emo wobble">🔨</div>
+    <h1 class="grad">Brute Force</h1>
+    <p>פריצה בשיטת <b>כוח גס</b></p>
+  </section>
+
+  <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
+    <h2>איך האקר מנחש סיסמה? 🤔</h2>
+    <p class="step">הוא לא "חושב"… הוא פשוט <b>מנסה הכול</b> — מהר מאוד!</p>
+    <div class="step counter" id="counter">0</div>
+    <p class="step"><b>ניחושים בשנייה אחת!</b> ⚡</p>
+    <div class="step"><button class="tapbtn" id="counterBtn">כמה מהר? ⚡</button></div>
+  </section>
+
+  <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
+    <h2>הסוד: מידע אישי 🔍</h2>
+    <p class="step">אם הסיסמה שלכם קשורה אליכם — קל לנחש אותה!</p>
+    <div class="card step" style="margin-top:10px">
+      <div class="row" style="font-size:clamp(1rem,3vw,1.6rem)">
+        <span class="pill">🐶 הכלב: לונה</span><span class="pill">🎂 נולד: 2011</span>
+      </div>
+      <div style="font-size:clamp(1.5rem,5vw,2.4rem);margin:16px 0">⬇️</div>
+      <div class="pw mono" style="font-size:clamp(1.4rem,5vw,2.6rem);color:var(--red);font-weight:900">luna2011</div>
+      <p style="color:var(--red);font-weight:700">נפרצת תוך שנייה! 😱</p>
+    </div>
+  </section>
+
+  <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
+    <h2>חלשה מול חזקה ⚔️</h2>
+    <div class="vs" style="margin-top:16px">
+      <div class="pwbox weak step"><div class="pw">luna2011</div><div class="time">⏱️ שנייה אחת</div></div>
+      <div class="pwbox strong step"><div class="pw">Ananas!Pingvin42</div><div class="time">🛡️ מיליוני שנים</div></div>
+    </div>
+    <p class="step" style="margin-top:18px">ההבדל ענק! סיסמה חזקה = המחשב מוותר. 💪</p>
+  </section>
+
+  <section class="slide" data-sec="Brute Force 🔨" data-rain="1">
+    <h2>🧁 מתכון לסיסמה חזקה</h2>
+    <div class="recipe-row" style="margin-top:20px">
+      <span class="ing step">3 מילים אקראיות</span><span class="step">➕</span>
+      <span class="ing step">מספר</span><span class="step">➕</span>
+      <span class="ing step">סימן (! ? #)</span>
+    </div>
+    <div class="step card mono" style="margin-top:24px;font-size:clamp(1.3rem,4.5vw,2.4rem);color:var(--gold)">Ananas!Pingvin42Gitara</div>
+    <p class="step">והכי חשוב: <b>לא קשור אליכם!</b> 🚫</p>
+  </section>
+
+  <!-- ===== PART 3: ENCRYPTION ===== -->
+  <section class="slide" data-sec="הצפנות 🔐">
+    <div class="kicker">נושא 3</div>
+    <div class="big-emo wobble">🔐</div>
+    <h1 class="grad">הצפנות</h1>
+    <p>שפה סודית למחשבים</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>מה זו הצפנה? 🤫</h2>
+    <p class="step">מחליפים כל אות באות אחרת, כדי שרק מי שיודע את ה<b>מפתח</b> יוכל לקרוא.</p>
+    <div class="row step" style="margin-top:20px;font-size:clamp(1.3rem,4vw,2.4rem);font-weight:900">
+      <span class="mono">שלום</span><span>🔒➡️</span><span class="mono" style="color:var(--gold)">בכפי</span>
+    </div>
+    <p class="step" style="margin-top:16px">גם ווטסאפ, הבנק והצבא מצפינים ככה את המידע! 🏦</p>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>גלגל ההצפנה 🎡</h2>
+    <p class="step" style="max-width:30ch">מזיזים את הגלגל, וכל אות הופכת לאות אחרת. ה<b>מספר</b> שהזזנו הוא המפתח!</p>
+    <div class="wheelwrap step float" id="wheelwrap">
+      <div class="ring outer" id="ringOuter"></div>
+      <div class="ring inner" id="ringInner"></div>
+      <div class="wheel-center">🎡</div>
+    </div>
+    <div class="step row" style="margin-top:10px">
+      <span>הזזה:</span><input type="range" min="0" max="21" value="3" class="slider" id="wheelKey"><span class="mono" id="wheelKeyVal" style="color:var(--gold);font-size:1.6rem">3</span>
+    </div>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <h2>פענחו יחד! 🔍</h2>
+    <p style="color:var(--muted)">ההודעה הוצפנה בהזזה של 3. גלו מה כתוב!</p>
+    <div class="mono" style="font-size:clamp(1.6rem,6vw,3.2rem);color:var(--gold);letter-spacing:4px;margin:10px">ñ</div>
+    <div class="decode-box" id="decodeBox"></div>
+    <div class="step"><button class="tapbtn gold" id="decodeBtn">פענח! 🔓</button></div>
+  </section>
+
+  <section class="slide" data-sec="הצפנות 🔐">
+    <div class="big-emo step">🔑</div>
+    <h2 class="step">זכרו את המפתח!</h2>
+    <p class="step">את ה<b>מפתח</b> (השיטה + המספר) שולחים <b>בנפרד</b> מההודעה.</p>
+    <p class="step" style="color:var(--gold);font-weight:700">אחרת זה כמו לנעול דלת… ולהדביק עליה את המפתח! 😅</p>
+  </section>
+
+  <!-- ===== CLOSING ===== -->
+  <section class="slide" data-sec="סיכום 🏅">
+    <h2>מה למדנו היום? 🧠</h2>
+    <div class="row" style="margin-top:20px">
+      <div class="card step"><div class="big-emo">🎣</div><h3>פישינג</h3><p>עוצרים, חושבים, שואלים</p></div>
+      <div class="card step"><div class="big-emo">🔨</div><h3>Brute Force</h3><p>סיסמה חזקה ולא אישית</p></div>
+      <div class="card step"><div class="big-emo">🔐</div><h3>הצפנות</h3><p>שומרים על המפתח</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-sec="סיכום 🏅">
+    <div class="big-emo float">🏅</div>
+    <h1 class="grad">אתם סוכני סייבר!</h1>
+    <p>עכשיו אתם יודעים להגן על עצמכם ברשת. 🛡️</p>
+    <div class="step"><button class="tapbtn" id="finishBtn">סיימנו! 🎉</button></div>
+  </section>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="hud">
+  <button id="prevBtn" title="הקודם">▶</button>
+  <button id="fsBtn" title="מסך מלא">⛶</button>
+  <button id="nextBtn" title="הבא">◀</button>
+</div>
+<div class="dots" id="dots"></div>
+<div class="hint-tap" id="hintTap">לחצו על המסך או ◀ להמשך</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const slides=$$(".slide"); let cur=0;
+
+/* ----- steps ----- */
+function steps(i){return [...slides[i].querySelectorAll(".step")]}
+function shown(i){return steps(i).filter(s=>s.classList.contains("show"))}
+function renderSlide(i,revealAll){
+  slides.forEach((s,k)=>s.classList.toggle("on",k===i));
+  const st=steps(i);
+  st.forEach((s,k)=>s.classList.toggle("show",revealAll?true:false));
+  $("#secBadge").textContent=slides[i].dataset.sec||"";
+  $("#prog").style.width=((i)/(slides.length-1)*100)+"%";
+  renderDots();
+  setBg(i);
+  if(i===idxCounter) resetCounter();
+  if(i===idxWheel) buildWheel();
+  if(i===idxDecode) resetDecode();
+  $("#hintTap").style.display= i===slides.length-1 ? "none":"block";
+}
+function next(){
+  const st=steps(cur), hidden=st.find(s=>!s.classList.contains("show"));
+  if(hidden){hidden.classList.add("show");onReveal(hidden);return}
+  if(cur<slides.length-1){cur++;renderSlide(cur,false)}
+}
+function prev(){
+  const sh=shown(cur);
+  if(sh.length){sh[sh.length-1].classList.remove("show");return}
+  if(cur>0){cur--;renderSlide(cur,true)}
+}
+function onReveal(el){ if(el.querySelector&&el.id){} beep(520,.04); }
+
+/* ----- dots ----- */
+const dotsWrap=$("#dots");
+slides.forEach((_,k)=>{const d=document.createElement("div");d.className="d";dotsWrap.appendChild(d)});
+function renderDots(){[...dotsWrap.children].forEach((d,k)=>d.classList.toggle("on",k===cur))}
+
+/* ----- backgrounds per section ----- */
+const BG={
+  "פתיחה":"radial-gradient(circle at 20% 10%,#3a1a7a 0,transparent 45%),radial-gradient(circle at 85% 90%,#0a4a6e 0,transparent 45%),linear-gradient(160deg,#0a0618,#141033)",
+  "פישינג 🎣":"radial-gradient(circle at 50% 120%,#0a4a6e 0,transparent 55%),linear-gradient(180deg,#071a2e,#0a2e4a)",
+  "Brute Force 🔨":"radial-gradient(circle at 15% 0,#0a3a2a 0,transparent 45%),linear-gradient(160deg,#030a08,#07140f)",
+  "הצפנות 🔐":"radial-gradient(circle at 10% 0,#3a1a7a 0,transparent 45%),radial-gradient(circle at 95% 100%,#5a1a4a 0,transparent 42%),linear-gradient(160deg,#120a2a,#1a0a2e)",
+  "סיכום 🏅":"radial-gradient(circle at 50% 20%,#5a3a00 0,transparent 50%),linear-gradient(160deg,#0a0618,#141033)",
+};
+function setBg(i){const sec=slides[i].dataset.sec;$("#bg").style.background=BG[sec]||BG["פתיחה"];
+  $("#rain").style.display=slides[i].dataset.rain?"block":"none"}
+
+/* ----- matrix rain (brute force) ----- */
+(function(){const cv=$("#rain"),cx=cv.getContext("2d");let cols,drops;
+ function rs(){cv.width=innerWidth;cv.height=innerHeight;cols=Math.floor(cv.width/16);drops=Array(cols).fill(0)}
+ rs();addEventListener("resize",rs);const ch="01<>#$%ABCDEF".split("");
+ setInterval(()=>{if(cv.style.display==="none")return;cx.fillStyle="rgba(3,10,8,.08)";cx.fillRect(0,0,cv.width,cv.height);
+   cx.fillStyle="#2bff9b";cx.font="14px monospace";
+   drops.forEach((y,i)=>{cx.fillText(ch[Math.random()*ch.length|0],i*16,y*16);drops[i]=(y*16>cv.height&&Math.random()>.97)?0:y+1})},80)})();
+
+/* ----- sound ----- */
+let actx,sound=true;
+function beep(f,dur=.08,type="sine",vol=.1){if(!sound)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(actx.destination);
+  const t=actx.currentTime;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)}catch(e){}}
+const sWin=()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.14,"square",.14),i*110))};
+
+/* ----- confetti ----- */
+const cc=$("#confetti"),ccx=cc.getContext("2d");let bits=[];
+function confetti(n=160){cc.width=innerWidth;cc.height=innerHeight;const col=["#7b2ff7","#00d4ff","#ffcf3f","#2bff9b","#ff5d73"];
+  for(let i=0;i<n;i++)bits.push({x:Math.random()*cc.width,y:-20,r:5+Math.random()*7,c:col[i%col.length],vy:2.5+Math.random()*3.5,vx:-2+Math.random()*4,a:Math.random()*6});
+  if(bits.length===n)requestAnimationFrame(cloop)}
+function cloop(){ccx.clearRect(0,0,cc.width,cc.height);bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.a+=.12;ccx.save();ccx.translate(b.x,b.y);ccx.rotate(b.a);ccx.fillStyle=b.c;ccx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.6);ccx.restore()});bits=bits.filter(b=>b.y<cc.height+20);if(bits.length)requestAnimationFrame(cloop);else ccx.clearRect(0,0,cc.width,cc.height)}
+
+/* ----- nav controls ----- */
+$("#nextBtn").onclick=e=>{e.stopPropagation();next()};
+$("#prevBtn").onclick=e=>{e.stopPropagation();prev()};
+document.addEventListener("keydown",e=>{
+  if(["ArrowLeft","ArrowDown"," ","PageDown","Enter"].includes(e.key)){e.preventDefault();next()}
+  else if(["ArrowRight","ArrowUp","PageUp","Backspace"].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==="Home"){cur=0;renderSlide(0,false)}
+  else if(e.key==="f"||e.key==="F"){toggleFs()}
+});
+$(".stage").addEventListener("click",e=>{if(e.target.closest("button,input,.slider,#wheelwrap"))return;next()});
+function toggleFs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();else document.exitFullscreen()}
+$("#fsBtn").onclick=e=>{e.stopPropagation();toggleFs()};
+
+/* ----- interactive buttons ----- */
+
+$$("[data-next]").forEach(b=>b.onclick=e=>{e.stopPropagation();next()});
+$("#castBtn")&&($("#castBtn").onclick=e=>{e.stopPropagation();
+  $("#hook").classList.add("drop");$("#baitLabel").classList.add("show");
+  setTimeout(()=>{const f=$("#fish");f.style.left="50%";f.style.top="48%";beep(300,.1);
+    setTimeout(()=>{f.textContent="😵";f.style.top="-10%";sWin();confetti(80)},700)},900)});
+
+/* ----- counter ----- */
+const idxCounter=slides.findIndex(s=>s.querySelector("#counter"));
+let counterRan=false;
+function resetCounter(){$("#counter").textContent="0";counterRan=false}
+$("#counterBtn")&&($("#counterBtn").onclick=e=>{e.stopPropagation();if(counterRan)return;counterRan=true;
+  const el=$("#counter");const target=1e9;const t0=performance.now();const dur=2200;
+  (function a(t){const p=Math.min((t-t0)/dur,1);const v=Math.floor(target*(p*p));
+    el.textContent=v.toLocaleString("en-US");if(p<1)requestAnimationFrame(a);else{el.textContent="1,000,000,000";sWin()}})(t0)});
+
+/* ----- cipher wheel ----- */
+const ALEF=["א","ב","ג","ד","ה","ו","ז","ח","ט","י","כ","ל","מ","נ","ס","ע","פ","צ","ק","ר","ש","ת"];
+const idxWheel=slides.findIndex(s=>s.querySelector("#wheelwrap"));
+let wheelBuilt=false;
+function placeRing(ring,letters,radius){
+  ring.innerHTML="";const n=letters.length;
+  letters.forEach((l,k)=>{const a=(k/n)*2*Math.PI-Math.PI/2;const el=document.createElement("div");el.className="l";el.textContent=l;
+    el.style.transform=`translate(${Math.cos(a)*radius}px,${Math.sin(a)*radius}px) rotate(${a+Math.PI/2}rad)`;ring.appendChild(el)})}
+function buildWheel(){const R=$("#wheelwrap").clientWidth/2;
+  placeRing($("#ringOuter"),ALEF,R*.86);placeRing($("#ringInner"),ALEF,R*.6);
+  wheelBuilt=true;spinWheel(+$("#wheelKey").value)}
+function spinWheel(k){$("#ringInner").style.transform=`rotate(${k/22*360}deg)`;$("#wheelKeyVal").textContent=k}
+$("#wheelKey")&&($("#wheelKey").oninput=e=>{spinWheel(+e.target.value);beep(400+(+e.target.value)*20,.03)});
+
+/* ----- decode demo (shift 3: encrypted of a word) ----- */
+const idxDecode=slides.findIndex(s=>s.querySelector("#decodeBox"));
+const PLAIN="מחשב";
+function encShift(s,k){return [...s].map(c=>{const i=ALEF.indexOf(c);return i<0?c:ALEF[(i+k)%22]}).join("")}
+const CIPHER=encShift(PLAIN,3);
+function resetDecode(){const box=$("#decodeBox");box.innerHTML=[...CIPHER].map(c=>`<span class="c">${c}</span>`).join("");
+  $("#decodeBox").dataset.done="0";
+  // show cipher in the header line above
+  const hdr=slides[idxDecode].querySelector(".mono");if(hdr)hdr.textContent=CIPHER}
+$("#decodeBtn")&&($("#decodeBtn").onclick=e=>{e.stopPropagation();if($("#decodeBox").dataset.done==="1")return;$("#decodeBox").dataset.done="1";
+  const cs=$$("#decodeBox .c");cs.forEach((el,k)=>setTimeout(()=>{el.textContent=PLAIN[k];el.classList.add("done");beep(500+k*80,.1);
+    if(k===cs.length-1){sWin();confetti(100)}},k*450))});
+
+$("#finishBtn")&&($("#finishBtn").onclick=e=>{e.stopPropagation();sWin();confetti(240)});
+
+/* init */
+renderSlide(0,false);
+</script>
+</body>
+</html>
