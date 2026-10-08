@@ -46,11 +46,11 @@ h2{font-size:clamp(1.4rem,4.5vw,2.2rem);font-weight:900;margin:.1em 0}
 .rule{color:var(--muted);font-size:1.02rem;margin:4px auto 14px;max-width:36ch;line-height:1.5}
 .legend-box{background:#0e0824;border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 16px}
 .legend-title{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:900;color:var(--gold);margin-bottom:12px}
-.legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.pair{display:flex;flex-direction:column;align-items:center;background:#1d1448;border:2px solid var(--p1);border-radius:12px;min-width:60px;padding:8px 6px}
-.pair .sym{font-size:clamp(1.6rem,5vw,2.1rem);line-height:1}
-.pair .arr{color:var(--muted);font-size:.9rem;line-height:1.2}
-.pair .let{font-size:clamp(1.5rem,5vw,2rem);font-weight:900;color:var(--green);font-family:var(--mono)}
+.legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.pair{display:flex;flex-direction:column;align-items:center;background:#1d1448;border:1px solid var(--p1);border-radius:9px;min-width:38px;padding:4px 4px}
+.pair .sym{font-size:clamp(1.05rem,3.4vw,1.45rem);line-height:1.1}
+.pair .arr{color:var(--muted);font-size:.7rem;line-height:1}
+.pair .let{font-size:clamp(1rem,3.2vw,1.35rem);font-weight:900;color:var(--green);font-family:var(--mono)}
 .reverse-hint{font-size:1.3rem;line-height:1.8}
 .reverse-hint .ex{display:inline-flex;align-items:center;gap:10px;background:#1d1448;border:1px solid var(--line);border-radius:12px;padding:8px 18px;font-family:var(--mono);font-size:1.5rem;font-weight:700;margin-top:8px}
 .msg-label{color:var(--muted);margin-bottom:6px}
@@ -67,7 +67,7 @@ h2{font-size:clamp(1.4rem,4.5vw,2.2rem);font-weight:900;margin:.1em 0}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) scale(.85);background:#17103a;border:1px solid var(--p2);color:var(--ink);font-weight:700;padding:12px 24px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:150}
-@media (max-width:600px){.card{padding:18px}.pair{min-width:52px}}
+@media (max-width:600px){.card{padding:18px}.pair{min-width:34px}}
 </style>
 </head>
 <body>
@@ -180,10 +180,8 @@ function render(){
     lb.querySelector(".legend-title").innerHTML='🔄 <span>איך מפענחים?</span>';
     lg.innerHTML='<div class="reverse-hint">קוראים מהסוף להתחלה 👈<br><span class="ex">דג <span style="color:var(--gold)">➜</span> גד</span></div>';
   }else{
-    lb.querySelector(".legend-title").innerHTML='📖 <span>מקרא (המפתח)</span>';
-    const seen=[];const pairs=[];
-    [...q.word].forEach(ch=>{const r=idx(ch);if(r<0||seen.includes(r))return;seen.push(r);
-      pairs.push({sym:enc1(ch,q.type,q.k),let:ALEF[r]})});
+    lb.querySelector(".legend-title").innerHTML='📖 <span>מקרא (המפתח) — חפשו כל אות/סמל מההודעה</span>';
+    const pairs=ALEF.map(pl=>({sym:enc1(pl,q.type,q.k),let:pl}));
     lg.innerHTML=pairs.map(p=>`<div class="pair"><div class="sym">${p.sym}</div><div class="arr">▼</div><div class="let">${p.let}</div></div>`).join("");
   }
   if(q.type==="symbols"||q.type==="gematria"){
