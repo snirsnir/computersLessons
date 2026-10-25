@@ -57,6 +57,10 @@ h2{font-size:clamp(1.5rem,4.6vw,2.3rem);font-weight:900;margin:.1em 0;line-heigh
 .lock-row input{flex:1;font-size:1.3rem;font-weight:800;text-align:center;letter-spacing:4px;padding:12px;border-radius:12px;background:#0e0824;border:2px solid var(--line);color:var(--ink)}
 .lock-row input:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .hinttxt{color:var(--muted);font-size:.92rem;margin-top:8px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;border-top:1px dashed var(--line);padding-top:18px;flex-wrap:wrap}
+.lock-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.lock-inline input{font-size:1.2rem;font-weight:800;text-align:center;letter-spacing:4px;padding:11px;border-radius:12px;background:#0e0824;border:2px solid var(--line);color:var(--ink);width:150px}
+.lock-inline input:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(0,212,255,.15)}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) scale(.85);background:#191241;border:1px solid var(--p2);color:var(--ink);font-weight:700;padding:12px 24px;border-radius:12px;opacity:0;transition:.25s;z-index:200;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
 .shake{animation:shake .4s}@keyframes shake{25%,75%{transform:translateX(-7px)}50%{transform:translateX(7px)}}
@@ -80,8 +84,8 @@ h2{font-size:clamp(1.5rem,4.6vw,2.3rem);font-weight:900;margin:.1em 0;line-heigh
 <div class="toast" id="toast"></div>
 
 <script>
-/* ===== instructor code (change here if you like) ===== */
-const TEACHER_CODE = "4728";
+/* ===== instructor codes — a different code to unlock each page (change here if you like) ===== */
+const CODES = {1:"4728", 2:"3165", 3:"9042", 4:"5873", 5:"2614", 6:"7390", 7:"1958"};
 
 const TOOLS={
   blob:"https://artsandculture.google.com/experiment/blob-opera/AAHWrq360NcGbw",
@@ -121,7 +125,7 @@ const PAGES=[
    steps:["כל צוות כותב <b>4–8 שורות</b> לשיר בנושא שבוחרים.","המדריך/ה מפיק/ה את השיר ב-Suno על המקרן.","מצביעים לשיר הכי טוב — והוא מושמע שוב בסוף! 🏆"]},
   {kind:"finish"},
 ];
-let page=0, sound=true;
+let page=0, maxUnlocked=0, sound=true;
 
 /* sound + toast + confetti */
 let actx;
@@ -139,12 +143,24 @@ function confetti(n=140){cv.width=innerWidth;cv.height=innerHeight;const c=["#7b
 function cl(){cx.clearRect(0,0,cv.width,cv.height);bits.forEach(b=>{b.y+=b.vy;b.x+=b.vx;b.a+=.12;cx.save();cx.translate(b.x,b.y);cx.rotate(b.a);cx.fillStyle=b.c;cx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.6);cx.restore()});bits=bits.filter(b=>b.y<cv.height+20);if(bits.length)requestAnimationFrame(cl);else cx.clearRect(0,0,cv.width,cv.height)}
 
 const stationNums=PAGES.filter(p=>p.kind==="station").length;
-function lockHTML(){
-  return `<div class="lock">
-    <div class="lk-title">🔒 סיימתם? כדי להמשיך — בקשו מהמדריך/ה קוד</div>
-    <div class="lock-row"><input id="code" inputmode="numeric" maxlength="8" placeholder="קוד מדריך/ה" autocomplete="off"><button class="big-btn" id="goBtn">המשך ←</button></div>
-    <div class="hinttxt">רק המדריך/ה יכול/ה לפתוח את התחנה הבאה ✋</div>
-  </div>`;
+function navHTML(){
+  const prev = page>0 ? `<button class="ghost-btn" id="prevBtn">→ הקודם</button>` : `<span></span>`;
+  const target=page+1;
+  if(target>=PAGES.length) return `<div class="nav">${prev}<span></span></div>`;
+  let fwd;
+  if(target<=maxUnlocked){
+    fwd=`<button class="big-btn" id="fwdBtn">המשך ←</button>`;
+  }else{
+    const lbl=(PAGES[target].kind==="finish")?"לסיום":(page===0?"להתחלה":"לתחנה הבאה");
+    fwd=`<div class="lock-inline"><input id="code" inputmode="numeric" maxlength="8" placeholder="קוד מדריך/ה" autocomplete="off"><button class="big-btn" id="goBtn">🔒 ${lbl}</button></div>`;
+  }
+  const note = target<=maxUnlocked ? "" : `<div class="hinttxt">🔒 בקשו מהמדריך/ה את הקוד של התחנה הבאה — לכל תחנה קוד משלה ✋</div>`;
+  return `<div class="nav">${prev}${fwd}</div>${note}`;
+}
+function wireNav(){
+  const pv=document.getElementById("prevBtn"); if(pv)pv.onclick=()=>{beep([330,440]);page--;render();scrollTo({top:0,behavior:"smooth"});};
+  const fw=document.getElementById("fwdBtn"); if(fw)fw.onclick=()=>{beep([440,660]);page++;render();scrollTo({top:0,behavior:"smooth"});};
+  const go=document.getElementById("goBtn"); if(go){ go.onclick=tryCode; const inp=document.getElementById("code"); inp.addEventListener("keydown",e=>{if(e.key==="Enter")tryCode()}); setTimeout(()=>inp.focus(),120); }
 }
 function render(){
   const p=PAGES[page];
@@ -163,10 +179,10 @@ function render(){
         📷 <b>מצלמות רשת</b> (לתחנת ציד האימוג׳י)<br>
         <span style="color:var(--gold)">אם אין מצלמות רשת במעבדה — לבקש מהאחזקה מראש.</span>
       </div>
-      <p class="lead">בסוף כל תחנה — מבקשים מהמדריך/ה קוד כדי לעבור הלאה.</p>
-      <button class="big-btn" id="startBtn">מתחילים 🚀</button>
+      <p class="lead">בסוף כל תחנה — מבקשים מהמדריך/ה את הקוד של התחנה הבאה (<b>לכל תחנה קוד אחר</b>).</p>
+      ${navHTML()}
     </div>`;
-    $("#startBtn").onclick=()=>{beep([440,660]);page++;render()};
+    wireNav();
     return;
   }
   if(p.kind==="finish"){
@@ -179,10 +195,11 @@ function render(){
         • אם AI יכולה לחקות קול — מה יקרה אם מישהו יחקה את הקול של אמא בטלפון? (לכן כדאי <b>מילת קוד</b> במשפחה 🔑)<br>
         • השיר שיצרנו — של מי הוא? שלנו? של ה־AI? של האמנים שהיא למדה מהם?
       </div>
-      <button class="ghost-btn" id="restartBtn">🔄 מהתחלה</button>
+      <div class="nav" style="justify-content:center;gap:12px"><button class="ghost-btn" id="prevBtn">→ הקודם</button><button class="ghost-btn" id="restartBtn">🔄 מהתחלה</button></div>
     </div>`;
     sWin(); confetti(220);
-    $("#restartBtn").onclick=()=>{beep([440,660]);page=0;render()};
+    const pv=document.getElementById("prevBtn"); if(pv)pv.onclick=()=>{beep([330,440]);page--;render();scrollTo({top:0,behavior:"smooth"});};
+    $("#restartBtn").onclick=()=>{beep([440,660]);page=0;maxUnlocked=0;render()};
     return;
   }
   // station
@@ -197,16 +214,15 @@ function render(){
     ${p.tip?`<div class="box tip">💡 <b>טיפ:</b> ${p.tip}</div>`:""}
     ${p.teach?`<div class="box teach">👩‍🏫 ${p.teach}</div>`:""}
     <a class="open-btn" href="${p.url}" target="_blank" rel="noopener">${p.btn}</a>
-    ${lockHTML()}
+    ${navHTML()}
   </div>`;
-  const inp=$("#code");
-  $("#goBtn").onclick=tryCode; inp.addEventListener("keydown",e=>{if(e.key==="Enter")tryCode()});
-  setTimeout(()=>inp.focus(),120);
+  wireNav();
 }
 function tryCode(){
-  const v=($("#code").value||"").trim();
-  if(v===TEACHER_CODE){ sGood(); confetti(60); page++; render(); scrollTo({top:0,behavior:"smooth"}); }
-  else{ sBad(); const row=document.querySelector(".lock-row"); row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); toast("קוד שגוי — בקשו מהמדריך/ה ✋"); $("#code").value=""; $("#code").focus(); }
+  const target=page+1;
+  const v=(document.getElementById("code").value||"").trim();
+  if(v===CODES[target]){ sGood(); confetti(60); if(target>maxUnlocked)maxUnlocked=target; page=target; render(); scrollTo({top:0,behavior:"smooth"}); }
+  else{ sBad(); const row=document.querySelector(".lock-inline"); if(row){row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake");} toast("קוד שגוי — בקשו מהמדריך/ה את הקוד של התחנה הזו ✋"); const inp=document.getElementById("code"); inp.value=""; inp.focus(); }
 }
 render();
 </script>
