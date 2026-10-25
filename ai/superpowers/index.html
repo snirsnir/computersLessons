@@ -90,7 +90,7 @@ const CODES = {1:"4728", 2:"3165", 3:"9042", 4:"5873", 5:"2614", 6:"7390", 7:"19
 const TOOLS={
   blob:"https://artsandculture.google.com/experiment/blob-opera/AAHWrq360NcGbw",
   saywhat:"https://artsandculture.google.com/experiment/say-what-you-see/jwG3m7wQShZngw",
-  leonardo:"https://app.leonardo.ai/realtime-canvas",
+  scroobly:"https://scroobly.com/",
   emoji:"https://emojiscavengerhunt.withgoogle.com/",
   voice:"https://www.openai.fm/",
   suno:"https://suno.com/create",
@@ -108,10 +108,10 @@ const PAGES=[
    sub:"AI שמציירת לפי מילים", url:TOOLS.saywhat, btn:"פתח את Say What You See ↗",
    steps:["האתר מציג <b>תמונת מטרה</b>.","כותבים תיאור <b>באנגלית</b>, וה־AI מציירת לפי מה שכתבתם.","ככל שהתיאור מדויק יותר (דמות + פעולה + מקום + צבעים) — הציון גבוה יותר!"],
    tip:"לא יודעים אנגלית? כתבו בעברית ב-<a href='"+TOOLS.translate+"' target='_blank' style='color:var(--p2)'>Google Translate</a>, והדביקו את התרגום."},
-  {kind:"station", n:3, emo:"🎨", needs:["📽️ מסך המדריך/ה"], title:"מציירים עם לאונרדו", teacher:true,
-   sub:"AI שהופכת קשקוש לתמונה", url:TOOLS.leonardo, btn:"פתח את לאונרדו ↗ (למדריך/ה)",
-   steps:["הפעילות הזו רצה על <b>מסך המדריך/ה</b> (הכלי מגיל 13).","מקשקשים ציור פשוט — וה־AI הופכת אותו לתמונה אמיתית <b>בזמן אמת</b>.","תנו רעיונות למדריך/ה מה לצייר ומה לכתוב בפרומפט!"],
-   teach:"מדריך/ה: אפשר גם 'מטקסט לתמונה' + Generate motion video כדי שהתמונה תזוז."},
+  {kind:"station", n:3, emo:"🎭", needs:["📷 מצלמת רשת"], title:"הבובה החיה",
+   sub:"AI שמפעילה את הציור שלכם", url:TOOLS.scroobly, btn:"פתח את Scroobly ↗",
+   steps:["מציירים דמות או דודל פשוט (או בוחרים דמות מוכנה באתר).","עומדים מול <b>המצלמה</b> — והדמות מחקה את התנועות שלכם <b>בזמן אמת</b>!","אתם ה‑<b>בובנאי</b> 🎭: הזיזו ידיים, קפצו, רקדו — והדמות זזה איתכם."],
+   wow:"ה‑AI מזהה את תנועות הגוף שלכם (זיהוי שלד) ומעבירה אותן לדמות. גרמו לה לרקוד! 🕺"},
   {kind:"station", n:4, emo:"📷", needs:["📷 מצלמת רשת"], title:"ציד האימוג׳י",
    sub:"AI שרואה את העולם", url:TOOLS.emoji, btn:"פתח את Emoji Scavenger Hunt ↗",
    steps:["האתר מראה <b>אימוג׳י</b> (למשל 👟 נעל, ✏️ עיפרון).","רוצו למצוא את <b>החפץ האמיתי</b> בכיתה והראו אותו למצלמה — לפני שהזמן נגמר!","ה־AI מזהה את החפץ דרך המצלמה. מצאתם? ממשיכים לאימוג׳י הבא 🏃"],
@@ -176,7 +176,7 @@ function render(){
       <div class="prereq">
         <b>לפני שמתחילים — צריך:</b><br>
         🎧 <b>אוזניות</b> (לתחנות הקול והשירה)<br>
-        📷 <b>מצלמות רשת</b> (לתחנת ציד האימוג׳י)<br>
+        📷 <b>מצלמות רשת</b> (לתחנות הבובה החיה וציד האימוג׳י)<br>
         <span style="color:var(--gold)">אם אין מצלמות רשת במעבדה — לבקש מהאחזקה מראש.</span>
       </div>
       <p class="lead">בסוף כל תחנה — מבקשים מהמדריך/ה את הקוד של התחנה הבאה (<b>לכל תחנה קוד אחר</b>).</p>
