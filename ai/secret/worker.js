@@ -4,8 +4,8 @@
 // GET על הכתובת מחזיר את רשימת המודלים הזמינים (לאבחון).
 
 const API = "https://generativelanguage.googleapis.com/v1beta";
-// העדפה; אם לא זמינים, ה-Worker מגלה אוטומטית מה כן זמין למפתח.
-const PREFERRED = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
+// העדפה (מהיר קודם); אם לא זמינים, ה-Worker מגלה אוטומטית מה כן זמין למפתח.
+const PREFERRED = ["gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-flash-latest"];
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -35,13 +35,16 @@ export default {
     }
     const payload = {
       contents,
-      generationConfig: { temperature: 0.85, maxOutputTokens: 400 },
+      // thinkingBudget:0 מכבה "חשיבה" → תשובות מהירות וקצרות (קריטי למשחק בזמן אמת)
+      generationConfig: { temperature: 0.85, maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } },
       safetySettings: [
         "HARM_CATEGORY_HARASSMENT", "HARM_CATEGORY_HATE_SPEECH",
         "HARM_CATEGORY_SEXUALLY_EXPLICIT", "HARM_CATEGORY_DANGEROUS_CONTENT",
       ].map(c => ({ category: c, threshold: "BLOCK_ONLY_HIGH" })),
     };
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
+    // גרסה ללא thinkingConfig, למקרה שמודל מסוים לא תומך בו (מחזיר 400)
+    const payloadNoThink = { ...payload, generationConfig: { temperature: 0.85, maxOutputTokens: 500 } };
 
     let candidates = PREFERRED.slice();
     let discovered = false;
@@ -49,9 +52,14 @@ export default {
     for (let i = 0; i < candidates.length; i++) {
       const model = candidates[i];
       try {
-        const resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
+        let resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
         });
+        if (resp.status === 400) { // המודל לא אהב את thinkingConfig — ננסה בלעדיו
+          resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadNoThink),
+          });
+        }
         if (resp.ok) {
           const data = await resp.json();
           const cand = data.candidates && data.candidates[0];
