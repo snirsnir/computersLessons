@@ -1,37 +1,38 @@
 // ===== ממונה הסוד — Cloudflare Worker: פרוקסי חינמי ל-Google Gemini =====
-// הגדרה חד-פעמית:
-//   1. ב-Cloudflare → Workers & Pages → Create → Worker. מדביקים את כל הקובץ הזה ל-"Edit code" ו-Deploy.
-//   2. ב-Worker → Settings → Variables and Secrets → Add → Secret בשם  GEMINI_KEY  עם מפתח Gemini החינמי (מ-aistudio.google.com/apikey).
-//   3. מעתיקים את כתובת ה-Worker (…​.workers.dev) ומדביקים בפאנל המדריך/ה במשחק (או שולחים לי ואטמיע בדף).
-// המפתח נשאר בצד השרת בלבד — הילדים לא נרשמים לכלום.
+// הגדרה: Settings → Variables and Secrets → Add → Secret בשם GEMINI_KEY (מפתח מ-aistudio.google.com/apikey).
+// הדף שולח {messages:[{role,content}]} ומקבל {text}. המפתח נשאר בצד השרת בלבד.
+// GET על הכתובת מחזיר את רשימת המודלים הזמינים (לאבחון).
 
-const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
+const API = "https://generativelanguage.googleapis.com/v1beta";
+// העדפה; אם לא זמינים, ה-Worker מגלה אוטומטית מה כן זמין למפתח.
+const PREFERRED = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
 export default {
   async fetch(request, env) {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
-    if (request.method !== "POST") return json({ error: "POST only" }, 405);
-
     const key = env.GEMINI_KEY;
     if (!key) return json({ error: "missing GEMINI_KEY secret" }, 500);
+
+    // GET → אבחון: אילו מודלים זמינים
+    if (request.method === "GET") return json({ models: await listModels(key) }, 200);
+    if (request.method !== "POST") return json({ error: "POST only" }, 405);
 
     let body;
     try { body = await request.json(); } catch { return json({ error: "bad json" }, 400); }
     const messages = Array.isArray(body.messages) ? body.messages : [];
 
-    // ממירים את הפורמט שלנו (system/user/assistant) לפורמט של Gemini
+    // המרה לפורמט של Gemini
     let system = "";
     const contents = [];
     for (const m of messages) {
       if (m.role === "system") system += (system ? "\n" : "") + (m.content || "");
       else contents.push({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: String(m.content || "") }] });
     }
-
     const payload = {
       contents,
       generationConfig: { temperature: 0.85, maxOutputTokens: 400 },
@@ -42,32 +43,52 @@ export default {
     };
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
 
+    let candidates = PREFERRED.slice();
+    let discovered = false;
     let lastErr = "";
-    for (const model of MODELS) {
+    for (let i = 0; i < candidates.length; i++) {
+      const model = candidates[i];
       try {
-        const resp = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-          { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
-        );
-        if (!resp.ok) {
-          lastErr = `${model}:${resp.status}`;
-          if (resp.status === 429 || resp.status === 404 || resp.status >= 500) continue; // ננסה מודל הבא
-          const t = await resp.text();
-          return json({ error: "gemini", detail: t.slice(0, 300) }, 502);
+        const resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          const cand = data.candidates && data.candidates[0];
+          const text = cand && cand.content && cand.content.parts
+            ? cand.content.parts.map(p => p.text || "").join("") : "";
+          if (text.trim()) return json({ text: text.trim() }, 200);
+          return json({ text: "אני רק ממונה הסוד הכיפי — בוא נישאר במשחק 🙂" }, 200);
         }
-        const data = await resp.json();
-        const cand = data.candidates && data.candidates[0];
-        const text = cand && cand.content && cand.content.parts
-          ? cand.content.parts.map(p => p.text || "").join("")
-          : "";
-        if (text.trim()) return json({ text: text.trim() }, 200);
-        // נחסם ע"י מסנן הבטיחות או ריק — מחזירים סירוב נעים בתוך הדמות
-        return json({ text: "אני רק ממונה הסוד הכיפי — בוא נישאר במשחק 🙂" }, 200);
+        lastErr = `${model}:${resp.status}`;
+        // מודל לא נמצא → נגלה פעם אחת מה באמת זמין ונחליף את הרשימה
+        if (resp.status === 404 && !discovered) {
+          const avail = await listModels(key);
+          if (avail.length) { candidates = avail; discovered = true; i = -1; continue; }
+        }
+        if (resp.status === 429 || resp.status === 404 || resp.status >= 500) continue; // ננסה הבא
+        const t = await resp.text();
+        return json({ error: "gemini", detail: t.slice(0, 300) }, 502);
       } catch (e) { lastErr = String(e); }
     }
     return json({ error: "all models failed", detail: lastErr }, 502);
   },
 };
+
+// רשימת מודלים שתומכים ב-generateContent, ממוינת כך ש-flash קודם (מהיר/חינמי)
+async function listModels(key) {
+  try {
+    const r = await fetch(`${API}/models?key=${key}&pageSize=200`);
+    if (!r.ok) return [];
+    const d = await r.json();
+    const names = (d.models || [])
+      .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+      .map(m => m.name.replace(/^models\//, ""))
+      .filter(n => !/vision|embedding|aqa|image|tts|audio/i.test(n));
+    const score = n => (/flash-lite/.test(n) ? 0 : /flash/.test(n) ? 1 : /pro/.test(n) ? 3 : 2) + (/latest/.test(n) ? -0.5 : 0);
+    return names.sort((a, b) => score(a) - score(b));
+  } catch { return []; }
+}
 
 function json(obj, status) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json", ...CORS } });
