@@ -1,11 +1,13 @@
-// ===== ממונה הסוד — Cloudflare Worker: פרוקסי חינמי ל-Google Gemini =====
-// הגדרה: Settings → Variables and Secrets → Add → Secret בשם GEMINI_KEY (מפתח מ-aistudio.google.com/apikey).
-// הדף שולח {messages:[{role,content}]} ומקבל {text}. המפתח נשאר בצד השרת בלבד.
-// GET על הכתובת מחזיר את רשימת המודלים הזמינים (לאבחון).
+// ===== ממונה הסוד — Cloudflare Worker: פרוקסי Gemini + שליטה מרכזית (KV) =====
+// Secrets/Variables:  GEMINI_KEY (Secret) = מפתח Gemini מ-aistudio.google.com/apikey
+// KV binding:         Variable name = KV  → namespace כלשהו (לשליטה מרכזית של המדריך/ה)
+// נתיבים:  POST /        → צ'אט AI        |  GET /        → רשימת מודלים (אבחון)
+//          GET  /config  → הגדרות הכיתה   |  POST /config → עדכון הגדרות (עם code)
 
 const API = "https://generativelanguage.googleapis.com/v1beta";
-// העדפה (מהיר קודם); אם לא זמינים, ה-Worker מגלה אוטומטית מה כן זמין למפתח.
 const PREFERRED = ["gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-flash-latest"];
+const TEACHER_CODE = "4242";
+const DEFAULT_CFG = { secret: "אננס", mode: "guess", level: 2, ts: 0 };
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -14,11 +16,31 @@ const CORS = {
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+
+    // ---------- שליטה מרכזית: הגדרות הכיתה ----------
+    if (url.pathname === "/config") {
+      if (request.method === "GET") return json(await readCfg(env), 200);
+      if (request.method === "POST") {
+        let b; try { b = await request.json(); } catch { return json({ error: "bad json" }, 400); }
+        if (b.code !== TEACHER_CODE) return json({ error: "bad code" }, 403);
+        if (!env.KV) return json({ error: "KV not configured" }, 500);
+        const cfg = {
+          secret: (String(b.secret || "").trim().slice(0, 40)) || DEFAULT_CFG.secret,
+          mode: b.mode === "gandalf" ? "gandalf" : "guess",
+          level: Math.min(5, Math.max(1, parseInt(b.level) || 2)),
+          ts: Date.now(),
+        };
+        await env.KV.put("config", JSON.stringify(cfg));
+        return json({ ok: true, ...cfg }, 200);
+      }
+      return json({ error: "method" }, 405);
+    }
+
+    // ---------- AI ----------
     const key = env.GEMINI_KEY;
     if (!key) return json({ error: "missing GEMINI_KEY secret" }, 500);
-
-    // GET → אבחון: אילו מודלים זמינים
     if (request.method === "GET") return json({ models: await listModels(key) }, 200);
     if (request.method !== "POST") return json({ error: "POST only" }, 405);
 
@@ -26,7 +48,6 @@ export default {
     try { body = await request.json(); } catch { return json({ error: "bad json" }, 400); }
     const messages = Array.isArray(body.messages) ? body.messages : [];
 
-    // המרה לפורמט של Gemini
     let system = "";
     const contents = [];
     for (const m of messages) {
@@ -35,7 +56,6 @@ export default {
     }
     const payload = {
       contents,
-      // thinkingBudget:0 מכבה "חשיבה" → תשובות מהירות וקצרות (קריטי למשחק בזמן אמת)
       generationConfig: { temperature: 0.85, maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } },
       safetySettings: [
         "HARM_CATEGORY_HARASSMENT", "HARM_CATEGORY_HATE_SPEECH",
@@ -43,7 +63,6 @@ export default {
       ].map(c => ({ category: c, threshold: "BLOCK_ONLY_HIGH" })),
     };
     if (system) payload.systemInstruction = { parts: [{ text: system }] };
-    // גרסה ללא thinkingConfig, למקרה שמודל מסוים לא תומך בו (מחזיר 400)
     const payloadNoThink = { ...payload, generationConfig: { temperature: 0.85, maxOutputTokens: 500 } };
 
     let candidates = PREFERRED.slice();
@@ -55,7 +74,7 @@ export default {
         let resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
         });
-        if (resp.status === 400) { // המודל לא אהב את thinkingConfig — ננסה בלעדיו
+        if (resp.status === 400) {
           resp = await fetch(`${API}/models/${model}:generateContent?key=${key}`, {
             method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadNoThink),
           });
@@ -69,12 +88,11 @@ export default {
           return json({ text: "אני רק ממונה הסוד הכיפי — בוא נישאר במשחק 🙂" }, 200);
         }
         lastErr = `${model}:${resp.status}`;
-        // מודל לא נמצא → נגלה פעם אחת מה באמת זמין ונחליף את הרשימה
         if (resp.status === 404 && !discovered) {
           const avail = await listModels(key);
           if (avail.length) { candidates = avail; discovered = true; i = -1; continue; }
         }
-        if (resp.status === 429 || resp.status === 404 || resp.status >= 500) continue; // ננסה הבא
+        if (resp.status === 429 || resp.status === 404 || resp.status >= 500) continue;
         const t = await resp.text();
         return json({ error: "gemini", detail: t.slice(0, 300) }, 502);
       } catch (e) { lastErr = String(e); }
@@ -83,7 +101,11 @@ export default {
   },
 };
 
-// רשימת מודלים שתומכים ב-generateContent, ממוינת כך ש-flash קודם (מהיר/חינמי)
+async function readCfg(env) {
+  try { if (env.KV) { const s = await env.KV.get("config"); if (s) return JSON.parse(s); } } catch {}
+  return DEFAULT_CFG;
+}
+
 async function listModels(key) {
   try {
     const r = await fetch(`${API}/models?key=${key}&pageSize=200`);
