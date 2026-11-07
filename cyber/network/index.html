@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מעבדת הרשת – טכנו־סיטי</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020a14;--line:#16406b;--ink:#e3f2ff;--muted:#7fa7c9;--g:#39ff8a;--b:#4dabf7;--gold:#ffd43b;--bad:#ff6b6b}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Rubik",Arial,sans-serif;color:var(--ink);min-height:100vh;background:radial-gradient(circle at 15% 0,#0b3b66 0,transparent 45%),radial-gradient(circle at 90% 100%,#06324a 0,transparent 45%),var(--bg);background-attachment:fixed}
+button{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:rgba(0,0,0,.4);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 9px;display:inline-flex}.logo-chip img{height:22px;display:block}
+.brand{font-weight:900;font-size:1.2rem;color:var(--b)}
+.flags{font-weight:900;color:var(--gold)}
+.wrap{max-width:1150px;margin:0 auto;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px}
+@media(max-width:880px){.wrap{grid-template-columns:1fr}}
+.card{background:rgba(6,24,44,.88);border:1px solid var(--line);border-radius:16px;padding:14px}
+.term{background:#000;border:1px solid #0d5;border-radius:12px;height:460px;overflow:auto;padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:.92rem;color:var(--g);direction:ltr;text-align:left;white-space:pre-wrap}
+.term .err{color:var(--bad)} .term .dim{color:#5c8} .term .hi{color:var(--gold)}
+.prompt{display:flex;gap:6px;align-items:center;background:#000;border:1px solid #0d5;border-radius:10px;margin-top:8px;padding:6px 10px;direction:ltr}
+.prompt span{color:var(--g);font-family:Consolas,monospace}
+.prompt input{flex:1;background:transparent;border:0;outline:0;color:#fff;font-family:Consolas,monospace;font-size:1rem}
+.cmds{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;direction:ltr}
+.cmd{background:#06233f;border:1px solid var(--line);color:var(--b);border-radius:8px;padding:5px 10px;font-family:Consolas,monospace;font-size:.85rem}
+.mission{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(0,0,0,.25)}
+.mission.done{border-color:#2b8a3e;background:rgba(43,138,62,.15)}
+.mission h4{margin:0 0 4px}
+.mission p{margin:0 0 6px;color:#cfe6ff;line-height:1.45;font-size:.94rem}
+.ans{display:flex;gap:6px}
+.ans input{flex:1;min-width:0;background:#020a14;border:1px solid var(--line);border-radius:8px;color:#fff;padding:7px;font-family:inherit}
+.ans button{background:var(--b);border:0;border-radius:8px;color:#00121f;font-weight:900;padding:0 12px}
+h1{margin:.1em 0;font-size:clamp(1.4rem,4vw,2rem)}
+.lead{line-height:1.6;color:#cfe6ff}
+.overlay{position:fixed;inset:0;background:rgba(0,6,12,.86);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.overlay.on{display:flex}
+.panel{background:linear-gradient(180deg,#0b2a4a,#051526);border:1px solid var(--line);border-radius:20px;padding:22px;max-width:560px;width:100%;text-align:center}
+.big{background:linear-gradient(135deg,#1864ab,#4dabf7);border:0;color:#fff;border-radius:12px;padding:11px 22px;font-weight:900;font-size:1.05rem;margin:6px}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 18px;font-weight:700;margin:6px}
+.login{background:#fff;color:#222;border-radius:12px;padding:16px;margin:12px 0;text-align:right}
+.login input{width:100%;margin:4px 0;padding:8px;border:1px solid #ccc;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="topbar">
+ <div style="display:flex;align-items:center;gap:10px"><span class="logo-chip"><img src="technoda.png" alt="טכנודע"></span><span class="brand">🌐 מעבדת הרשת – טכנו־סיטי</span></div>
+ <span class="flags" id="flags">🚩 0 / 6</span>
+</div>
+
+<div class="overlay on" id="intro">
+ <div class="panel">
+  <div style="font-size:3rem">🛰️</div>
+  <h1>משימה ליחידת הסייבר</h1>
+  <p class="lead">חברת <b>טכנו־סיטי</b> ביקשה מהיחידה שלכם לבדוק את הרשת שלה – <b>ברשות מלאה</b>. כל מכשיר ברשת מקבל <b>כתובת IP</b>, כמו כתובת של בית: 4 מספרים בין 0 ל־255, למשל <b dir="ltr">10.0.0.23</b>.</p>
+  <p class="lead">השתמשו בטרמינל (מסך הפקודות), פתרו 6 משימות ואספו 🚩 דגלים לצוות!</p>
+  <button class="big" id="start">מתחילים ←</button>
+ </div>
+</div>
+
+<div class="overlay" id="loginOv">
+ <div class="panel">
+  <h1>🔐 נמצא שער כניסה!</h1>
+  <p class="lead">הגעתם לכתובת <b dir="ltr" id="loginIp"></b>. זו מערכת ניהול של המצלמות בחניון.</p>
+  <div class="login"><b>📷 Parking-Cam Admin</b><input placeholder="שם משתמש"><input placeholder="סיסמה" type="password"></div>
+  <p class="lead"><b>מה עושה האקר אתי?</b></p>
+  <button class="ghost" id="tryLogin">🔓 מנסה לנחש סיסמה</button>
+  <button class="big" id="reportLogin">📝 עוצר ומדווח לחברה</button>
+  <p class="lead" id="loginMsg" style="min-height:1.4em"></p>
+ </div>
+</div>
+
+<div class="overlay" id="winOv">
+ <div class="panel">
+  <div style="font-size:3.4rem">🏆</div>
+  <h1>היחידה השלימה את בדיקת הרשת!</h1>
+  <p class="lead">אספתם את כל 6 הדגלים. הראו את המסך למדריך/ה כדי לקבל את הדגלים לטבלת היחידות 🚩</p>
+  <button class="big" onclick="document.getElementById('winOv').classList.remove('on')">סגירה</button>
+ </div>
+</div>
+
+<div class="wrap">
+ <div class="card">
+  <div class="term" id="term"></div>
+  <div class="prompt"><span>C:\TechnoCity&gt;</span><input id="cmd" autocomplete="off" spellcheck="false" placeholder="type a command (help)"></div>
+  <div class="cmds" id="cmds"></div>
+ </div>
+ <div class="card">
+  <h3 style="margin:.1em 0 .5em">🎯 משימות היחידה</h3>
+  <div id="missions"></div>
+ </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+// ---- simulated network (192.168.1.x is the classroom LAN) ----
+const ME={ip:"192.168.1.23",gw:"192.168.1.1",pub:"84.95.214.37",mask:"255.255.255.0",mac:"5c-26-0a-1f-77-23"};
+const LAN=[
+ {ip:"192.168.1.1",name:"router",mac:"a4-2b-b0-11-00-01",alive:true,ports:[80]},
+ {ip:"192.168.1.10",name:"teacher-pc",mac:"5c-26-0a-1f-77-10",alive:true,ports:[]},
+ {ip:"192.168.1.23",name:"you",mac:ME.mac,alive:true,ports:[]},
+ {ip:"192.168.1.31",name:"printer",mac:"00-1b-a9-4c-22-31",alive:true,ports:[9100]},
+ {ip:"192.168.1.42",name:"smart-tv",mac:"cc-2d-8c-90-12-42",alive:true,ports:[8008]},
+ {ip:"192.168.1.57",name:"parking-cam",mac:"e0-50-8b-33-71-57",alive:true,ports:[80]},
+];
+const NET={"8.8.8.8":{name:"Google DNS",ms:21},"1.1.1.1":{name:"Cloudflare",ms:18},"212.148.2.3":null,"192.168.1.99":null};
+LAN.forEach(d=>NET[d.ip]={name:d.name,ms:1+Math.floor(Math.random()*4)});
+
+const MISSIONS=[
+ {t:"1. מה הכתובת שלי?",d:"מצאו את כתובת ה־IP של המחשב שלכם ברשת הכיתה. רמז: <code>ipconfig</code>",a:["192.168.1.23"]},
+ {t:"2. מי מחובר?",d:"כמה מכשירים מופיעים בטבלת השכנים של המחשב (לא כולל אתכם)? רמז: <code>arp -a</code>",a:["5"]},
+ {t:"3. חי או לא?",d:"איזו משתי הכתובות <b>לא</b> עונה: 8.8.8.8 או 212.148.2.3? רמז: <code>ping</code>",a:["212.148.2.3"]},
+ {t:"4. הכתובת הציבורית",d:"באינטרנט רואים אתכם בכתובת אחרת – הציבורית. מה היא? רמז: <code>whatismyip</code>",a:["84.95.214.37"]},
+ {t:"5. סורקי הרשת",d:"סרקו את רשת הכיתה ומצאו את שם המכשיר שיש לו פורט 80 פתוח (חוץ מהראוטר). רמז: <code>scan 192.168.1.1-60</code>",a:["parking-cam","parkingcam"]},
+ {t:"6. האקר אתי",d:"התחברו למכשיר שמצאתם: <code>connect &lt;ip&gt;</code> – והחליטו מה עושים.",a:null},
+];
+let flags=0;const done=new Set();
+function renderMissions(){
+ $("#missions").innerHTML=MISSIONS.map((m,i)=>`<div class="mission ${done.has(i)?"done":""}"><h4>${done.has(i)?"✅":"🚩"} ${m.t}</h4><p>${m.d}</p>${m.a&&!done.has(i)?`<div class="ans"><input id="a${i}" placeholder="התשובה"><button data-i="${i}">בדיקה</button></div>`:""}</div>`).join("");
+ document.querySelectorAll(".ans button").forEach(b=>b.onclick=()=>check(+b.dataset.i));
+ document.querySelectorAll(".ans input").forEach(inp=>inp.addEventListener("keydown",e=>{if(e.key==="Enter")check(+inp.id.slice(1))}));
+ $("#flags").textContent=`🚩 ${flags} / 6`;
+}
+function win(i){if(done.has(i))return;done.add(i);flags++;renderMissions();out(`[+] FLAG ${i+1} captured! 🚩`,"hi");if(flags===6)setTimeout(()=>$("#winOv").classList.add("on"),600)}
+function check(i){const v=($("#a"+i).value||"").trim().toLowerCase().replace(/\s|-/g,"");
+ if(MISSIONS[i].a.some(a=>a.replace(/-/g,"")===v))win(i);else{$("#a"+i).style.borderColor="#ff6b6b";setTimeout(()=>$("#a"+i)&&($("#a"+i).style.borderColor=""),900)}}
+
+const term=$("#term");
+function out(t,cls){const s=document.createElement("div");if(cls)s.className=cls;s.textContent=t;term.appendChild(s);term.scrollTop=1e9}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const ipToN=ip=>ip.split(".").reduce((a,b)=>a*256+ +b,0);
+const nToIp=n=>[n>>>24,(n>>16)&255,(n>>8)&255,n&255].join(".");
+let busy=false;
+async function run(line){
+ out("C:\\TechnoCity> "+line,"dim");
+ const [c,...args]=line.trim().split(/\s+/);const cmd=(c||"").toLowerCase();
+ if(cmd==="help"){out("Commands:\n  ipconfig            - my IP address\n  arp -a              - devices my computer knows\n  ping <ip>           - is a device alive?\n  whatismyip          - my public internet address\n  scan <from-to>      - scan the classroom network (e.g. scan 192.168.1.1-60)\n  connect <ip>        - open a device's web page\n  cls                 - clear screen");}
+ else if(cmd==="cls")term.innerHTML="";
+ else if(cmd==="ipconfig"){out(`Windows IP Configuration\n\nEthernet adapter (TechnoCity-Lab):\n   IPv4 Address. . . . . : ${ME.ip}\n   Subnet Mask . . . . . : ${ME.mask}\n   Default Gateway . . . : ${ME.gw}`)}
+ else if(cmd==="arp"&&args[0]==="-a"){out("Interface: "+ME.ip+"\n  Internet Address      Physical Address      Type");LAN.filter(d=>d.ip!==ME.ip).forEach(d=>out(`  ${d.ip.padEnd(22)}${d.mac.padEnd(22)}dynamic`))}
+ else if(cmd==="whatismyip"){out("Your public IP address is: "+ME.pub+"\n(this is how websites on the internet see your school)")}
+ else if(cmd==="ping"){const ip=args[0];if(!ip){out("usage: ping <ip>","err");return}
+  out(`Pinging ${ip} with 32 bytes of data:`);const h=NET[ip];
+  for(let k=0;k<4;k++){await sleep(380);out(h?`Reply from ${ip}: bytes=32 time=${h.ms+Math.floor(Math.random()*5)}ms TTL=58`:"Request timed out.",h?"":"err")}
+  out(h?`${ip} is ALIVE ✔`:`${ip} did not answer ✖ (no device / offline)`,h?"hi":"err")}
+ else if(cmd==="scan"){const r=(args[0]||"").split("-");
+  if(r.length!==2||!r[0].startsWith("192.168.1.")){out("Only the TechnoCity classroom network may be scanned (192.168.1.x).\nScanning other people's networks without permission is illegal!","err");return}
+  const a=ipToN(r[0]),b=r[1].includes(".")?ipToN(r[1]):ipToN("192.168.1."+r[1]);
+  if(b<a||b-a>254){out("bad range","err");return}
+  out(`Scanning ${nToIp(a)} - ${nToIp(b)} ...`);
+  for(let n=a;n<=b;n++){const ip=nToIp(n),d=LAN.find(x=>x.ip===ip);if(d){await sleep(260);out(`  ${ip.padEnd(16)} UP   ${d.name.padEnd(12)} open ports: ${d.ports.length?d.ports.join(","):"-"}`)}}
+  await sleep(200);out("Scan complete.","hi")}
+ else if(cmd==="connect"){const ip=args[0],d=LAN.find(x=>x.ip===ip);
+  if(!d){out("Connection failed: no device at "+(ip||"?"),"err");return}
+  if(!d.ports.includes(80)){out(`${ip} (${d.name}) has no web page (port 80 closed)`,"err");return}
+  if(d.name==="router"){out("Router admin page – the class admin manages this one. Nothing to check here.");return}
+  out(`Opening http://${ip} ...`);$("#loginIp").textContent=ip;$("#loginMsg").textContent="";$("#loginOv").classList.add("on")}
+ else if(cmd)out(`'${c}' is not recognized. Type help`,"err");
+}
+$("#tryLogin").onclick=()=>{$("#loginMsg").textContent="✋ עצרו! לנסות להיכנס למערכת של מישהו אחר בלי רשות זו פריצה – גם אם רק 'בודקים'. נסו שוב."};
+$("#reportLogin").onclick=()=>{$("#loginOv").classList.remove("on");out("[i] Reported: parking camera admin page is open to the network. ✔","hi");win(5)};
+$("#cmd").addEventListener("keydown",async e=>{if(e.key==="Enter"&&!busy){const v=e.target.value;e.target.value="";busy=true;await run(v);busy=false}});
+["help","ipconfig","arp -a","ping 8.8.8.8","whatismyip","scan 192.168.1.1-60","cls"].forEach(t=>{const b=document.createElement("button");b.className="cmd";b.textContent=t;b.onclick=()=>{$("#cmd").value=t;$("#cmd").focus()};$("#cmds").appendChild(b)});
+$("#start").onclick=()=>{$("#intro").classList.remove("on");$("#cmd").focus()};
+out("TechnoCity Network Lab v1.0 – authorized security check\nType help to see the commands.","hi");
+renderMissions();
+</script>
+</body>
+</html>

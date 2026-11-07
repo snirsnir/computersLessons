@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מעבדת הפרומפטים</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg0:#0a0618;--bg1:#141033;--line:#34245f;--ink:#f1edff;--muted:#a99fd6;--p1:#7b2ff7;--p2:#00d4ff;--gold:#ffcf3f;--good:#2bff9b}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Rubik",Arial,sans-serif;color:var(--ink);min-height:100vh;
+ background:radial-gradient(circle at 12% 0,#3a1a7a 0,transparent 45%),radial-gradient(circle at 92% 100%,#0a4a6e 0,transparent 45%),linear-gradient(160deg,var(--bg0),var(--bg1));background-attachment:fixed}
+button{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(10,6,24,.8);border-bottom:1px solid var(--line)}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 9px;display:inline-flex}.logo-chip img{height:22px;display:block}
+.brand{font-weight:900;font-size:1.2rem;background:linear-gradient(90deg,var(--p2),var(--p1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.card{background:rgba(25,18,65,.85);border:1px solid var(--line);border-radius:18px;padding:16px}
+h1{margin:.1em 0;font-size:clamp(1.5rem,4.5vw,2.2rem);font-weight:900}
+.grad{background:linear-gradient(90deg,var(--p2),var(--p1),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:#ddd4ff;line-height:1.6}
+.cat{margin:14px 0 4px;font-weight:900}
+.cat small{font-weight:400;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:#0e0824;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 13px;font-weight:600}
+.chip.on{background:linear-gradient(90deg,var(--p1),var(--p2));border-color:transparent;color:#fff}
+.out{background:#0e0824;border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;line-height:1.6;min-height:52px}
+.out.en{direction:ltr;text-align:left;font-family:Consolas,monospace;color:#bdeeff}
+.big-btn{background:linear-gradient(135deg,var(--p1),var(--p2));border:0;color:#fff;border-radius:14px;padding:12px 18px;font-weight:900;font-size:1.02rem;width:100%;margin-top:6px}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:9px 14px;font-weight:700}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.stars{font-size:1.6rem;letter-spacing:3px}
+.meter{height:10px;border-radius:999px;background:#0e0824;overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff6b6b,var(--gold),var(--good));transition:.3s}
+input[type=text]{width:100%;font-family:inherit;font-size:1rem;padding:10px 12px;border-radius:12px;background:#0e0824;border:1px solid var(--line);color:var(--ink)}
+.hint{color:var(--muted);font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#191241;border:1px solid var(--p2);padding:10px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="topbar"><span class="logo-chip"><img src="technoda.png" alt="טכנודע"></span><span class="brand">🎨 מעבדת הפרומפטים</span></div>
+<div class="wrap">
+ <div class="card">
+  <h1 class="grad">בונים פרומפט מנצח ✨</h1>
+  <p class="lead">מחולל תמונות של AI מצייר <b>בדיוק</b> מה שכותבים לו. ככל שהפרומפט ספציפי יותר – התמונה מדהימה יותר. בחרו חלק מכל קטגוריה, או לחצו על 🎲 לקומבינציה מטורפת!</p>
+  <div id="cats"></div>
+  <div class="cat">✍️ תוספת משלכם <small>(בעברית – כפתור ✨ יתרגם אותה)</small></div>
+  <input type="text" id="extra" placeholder="למשל: עם כובע יום הולדת ומשקפי שמש">
+ </div>
+ <div class="card" style="position:sticky;top:12px">
+  <div class="cat" style="margin-top:0">📊 מד הפרומפט</div>
+  <div class="meter"><i id="meter"></i></div>
+  <div class="stars" id="stars">☆☆☆☆☆</div>
+  <div class="hint" id="meterTxt"></div>
+  <div class="cat">🇮🇱 מה ביקשנו</div>
+  <div class="out" id="he">בחרו חלקים מהקטגוריות…</div>
+  <div class="cat">🇬🇧 הפרומפט באנגלית</div>
+  <div class="out en" id="en">…</div>
+  <button class="big-btn" id="copy">📋 העתקת הפרומפט</button>
+  <div class="row">
+   <button class="ghost" id="dice">🎲 קומבינציה מטורפת</button>
+   <button class="ghost" id="ai">✨ שפרו לי עם AI</button>
+   <button class="ghost" id="reset">🧽 מחדש</button>
+  </div>
+  <p class="hint">מדביקים את הפרומפט במחולל התמונות (Leonardo / Gemini) – מהמחשב של המדריך/ה או מהחשבון של הטכנודע.</p>
+ </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const WORKER="https://sod.papasnir.workers.dev/";
+const CATS=[
+ {k:"who",t:"🦁 מי?",o:[["חמור","a donkey"],["דרקון אדום","a red dragon"],["שקנאי","a pelican"],["רובוט חמוד","a cute robot"],["חתול ג׳ינג׳י","a ginger cat"],["פינגווין","a penguin"],["אסטרונאוטית","an astronaut girl"],["דינוזאור","a dinosaur"],["כלב גולדן","a golden retriever"],["תמנון","an octopus"]]},
+ {k:"do",t:"🏃 עושה מה?",o:[["אוכל המבורגר","eating a hamburger"],["רוכב על אופניים","riding a bicycle"],["מלמד כיתה","teaching a class"],["מנגן בגיטרה","playing the guitar"],["מוכר גלידה","selling ice cream"],["רוקד","dancing"],["בועט בכדור","kicking a ball"],["קורא ספר","reading a book"]]},
+ {k:"where",t:"📍 איפה?",o:[["בחלל","in outer space"],["על הירח","on the moon"],["במגרש כדורגל","in a soccer stadium"],["מתחת לים","under the sea"],["במטבח","in a kitchen"],["ביער קסום","in a magical forest"],["בכיכר העיר","in a city square"],["על ענן","on a cloud"]]},
+ {k:"style",t:"🖌️ סגנון",o:[["צילום אמיתי","realistic photo"],["קומיקס","comic book style"],["תלת־ממד כמו סרט אנימציה","3D animated movie style"],["ציור מים","watercolor painting"],["פיקסלים","pixel art"],["ציור של ילד","child's crayon drawing"]]},
+ {k:"mood",t:"😄 אווירה",o:[["מצחיק","funny"],["צבעוני מאוד","very colorful"],["מסתורי","mysterious"],["חגיגי","festive"],["רגוע","calm"],["אפי ודרמטי","epic and dramatic"]]},
+];
+const sel={};
+function render(){
+ const box=$("#cats");box.innerHTML="";
+ CATS.forEach(c=>{const h=document.createElement("div");h.className="cat";h.textContent=c.t;box.appendChild(h);
+  const w=document.createElement("div");w.className="chips";
+  c.o.forEach((o,i)=>{const b=document.createElement("button");b.className="chip"+(sel[c.k]===i?" on":"");b.textContent=o[0];
+   b.onclick=()=>{sel[c.k]=sel[c.k]===i?undefined:i;render()};w.appendChild(b)});box.appendChild(w)});
+ update();
+}
+let aiEnglish="";
+function update(){
+ const pick=k=>{const c=CATS.find(x=>x.k===k);return sel[k]===undefined?null:c.o[sel[k]]};
+ const who=pick("who"),d=pick("do"),wh=pick("where"),st=pick("style"),md=pick("mood"),ex=$("#extra").value.trim();
+ const he=[who&&who[0],d&&d[0],wh&&wh[0],ex].filter(Boolean).join(" ")+(st?`, בסגנון ${st[0]}`:"")+(md?`, ${md[0]}`:"");
+ $("#he").textContent=he.trim()||"בחרו חלקים מהקטגוריות…";
+ const en=aiEnglish||[[who&&who[1],d&&d[1],wh&&wh[1]].filter(Boolean).join(" "),st&&st[1],md&&md[1],"high detail"].filter(Boolean).join(", ");
+ $("#en").textContent=(who||d||wh||aiEnglish)?en:"…";
+ const n=[who,d,wh,st,md].filter(Boolean).length+(ex?1:0);
+ const s=Math.min(5,n);$("#stars").textContent="★".repeat(s)+"☆".repeat(5-s);
+ $("#meter").style.width=(s*20)+"%";
+ $("#meterTxt").textContent=["בחרו לפחות מי ומה הוא עושה","התחלה טובה! הוסיפו מקום","יפה! עכשיו סגנון","כמעט מושלם – אווירה?","פרומפט מצוין!","פרומפט של מקצוענים! 🏆"][s];
+}
+$("#extra").addEventListener("input",()=>{aiEnglish="";update()});
+$("#copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($("#en").textContent);toast("הפרומפט הועתק! 📋")};
+$("#reset").onclick=()=>{for(const k in sel)delete sel[k];$("#extra").value="";aiEnglish="";render()};
+$("#dice").onclick=()=>{aiEnglish="";CATS.forEach(c=>sel[c.k]=Math.floor(Math.random()*c.o.length));render();toast("🎲 קומבינציה מטורפת!")};
+$("#ai").onclick=async()=>{
+ const he=$("#he").textContent;if(he.startsWith("בחרו")){toast("בחרו קודם כמה חלקים");return}
+ $("#en").textContent="✨ ה-AI משפר…";
+ try{
+  const r=await fetch(WORKER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[
+   {role:"system",content:"You turn a Hebrew image idea from a child into ONE short English prompt for an image generator (max 40 words). Keep it kid-friendly: if the idea contains violence, gore, sexual content, real people being mocked, or anything unsafe, instead return a safe cute version. Output ONLY the English prompt, nothing else."},
+   {role:"user",content:he}]})});
+  const d=await r.json();aiEnglish=(d.text||"").replace(/^["']|["']$/g,"").trim();update();toast("✨ שודרג!");
+ }catch(e){aiEnglish="";update();toast("ה-AI לא זמין כרגע – הפרומפט הרגיל עובד מצוין")}
+};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),1700)}
+render();
+</script>
+</body>
+</html>
