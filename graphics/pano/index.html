@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מקרן 360 של הכיתה</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+<style>
+:root{--line:#5a2a5e;--ink:#fff1f7;--p1:#d6336c;--p2:#ffd43b}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:"Rubik",Arial,sans-serif;color:var(--ink);display:flex;flex-direction:column;background:linear-gradient(160deg,#160a1c,#2a0f2e)}
+button,label.btn{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:rgba(0,0,0,.4);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 9px;display:inline-flex}.logo-chip img{height:22px;display:block}
+.brand{font-weight:900;font-size:1.2rem;background:linear-gradient(90deg,var(--p2),var(--p1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{background:linear-gradient(135deg,var(--p1),#9c36b5);border:0;color:#fff;border-radius:12px;padding:10px 18px;font-weight:900;display:inline-block}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:9px 14px;font-weight:700}
+#pano{flex:1;min-height:300px}
+.empty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+.empty p{max-width:560px;line-height:1.7;font-size:1.1rem}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+ <div style="display:flex;align-items:center;gap:10px"><span class="logo-chip"><img src="technoda.png" alt="טכנודע"></span><span class="brand">🌐 מקרן 360 של הכיתה</span></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <label class="btn" for="file">📂 פתיחת תמונת פנורמה</label><input type="file" id="file" accept="image/*">
+  <button class="ghost" id="spin">🔄 סיבוב אוטומטי</button>
+  <button class="ghost" id="full">⛶ מסך מלא</button>
+ </div>
+</div>
+<div class="empty" id="empty"><p>🎡 בחרו את תמונת הפנורמה הרחבה שיצרתם (קובץ רחב פי 2 מהגובה).<br>התמונה נפתחת <b>רק במחשב הזה</b> – לא עולה לאינטרנט.<br>גררו עם העכבר כדי להסתובב בתוך העולם, וגלגלת כדי להתקרב.</p></div>
+<div id="pano" style="display:none"></div>
+<script>
+let viewer=null,spinning=false;
+document.getElementById("file").onchange=e=>{
+ const f=e.target.files[0];if(!f)return;
+ const url=URL.createObjectURL(f);
+ document.getElementById("empty").style.display="none";document.getElementById("pano").style.display="block";
+ if(viewer)viewer.destroy();
+ viewer=pannellum.viewer("pano",{type:"equirectangular",panorama:url,autoLoad:true,showControls:true,compass:false,hfov:100});
+};
+document.getElementById("spin").onclick=()=>{if(!viewer)return;spinning=!spinning;spinning?viewer.startAutoRotate(-4):viewer.stopAutoRotate()};
+document.getElementById("full").onclick=()=>{viewer&&viewer.toggleFullscreen()};
+</script>
+</body>
+</html>
