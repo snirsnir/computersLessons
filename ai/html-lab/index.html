@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מעבדת HTML – בונים אתר</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg0:#0a0618;--bg1:#141033;--line:#34245f;--ink:#f1edff;--muted:#a99fd6;--p1:#7b2ff7;--p2:#00d4ff;--gold:#ffcf3f;--good:#2bff9b;--bad:#ff6b6b}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Rubik",Arial,sans-serif;color:var(--ink);min-height:100vh;
+ background:radial-gradient(circle at 12% 0,#3a1a7a 0,transparent 45%),radial-gradient(circle at 92% 100%,#0a4a6e 0,transparent 45%),linear-gradient(160deg,var(--bg0),var(--bg1));background-attachment:fixed}
+button{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:rgba(10,6,24,.85);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 9px;display:inline-flex}.logo-chip img{height:22px;display:block}
+.brand{font-weight:900;font-size:1.2rem;background:linear-gradient(90deg,var(--p2),var(--p1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 14px;font-weight:700}
+.tab.on{background:linear-gradient(90deg,var(--p1),var(--p2));border-color:transparent}
+.wrap{max-width:1250px;margin:0 auto;padding:14px}
+.view{display:none}.view.on{display:block}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.card{background:rgba(25,18,65,.88);border:1px solid var(--line);border-radius:16px;padding:14px}
+h2{margin:.1em 0 .4em;font-size:1.35rem}
+.lead{color:#ddd4ff;line-height:1.6;margin:.3em 0}
+code{background:#0e0824;border:1px solid var(--line);border-radius:6px;padding:1px 6px;direction:ltr;unicode-bidi:isolate;display:inline-block;color:#bdeeff}
+textarea.code{width:100%;height:330px;background:#07041a;color:#e8f7ff;border:1px solid var(--line);border-radius:12px;padding:12px;font-family:Consolas,"Courier New",monospace;font-size:.95rem;direction:ltr;text-align:left;resize:vertical;tab-size:2}
+iframe{width:100%;height:380px;border:0;border-radius:12px;background:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.btn{background:linear-gradient(135deg,var(--p1),var(--p2));border:0;color:#fff;border-radius:12px;padding:10px 18px;font-weight:900}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:9px 14px;font-weight:700}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.st{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#0e0824;color:var(--ink);font-weight:900}
+.st.on{background:linear-gradient(135deg,var(--p1),var(--p2));border-color:transparent}
+.st.done{border-color:var(--good);color:var(--good)}
+.msg{min-height:1.5em;font-weight:700;margin-top:6px}
+.msg.good{color:var(--good)}.msg.bad{color:var(--bad)}
+.tag{display:inline-block;background:rgba(0,212,255,.12);border:1px solid #1b6e85;color:#bdeeff;border-radius:999px;padding:2px 10px;font-size:.85rem;margin:2px}
+#qr{background:#fff;padding:14px;border-radius:14px;display:inline-block;margin-top:10px}
+.qrcard{text-align:center}
+input[type=text]{width:100%;font-family:inherit;font-size:1rem;padding:11px;border-radius:12px;background:#0e0824;border:1px solid var(--line);color:var(--ink);direction:ltr}
+.hint{color:var(--muted);font-size:.92rem;line-height:1.5}
+@media print{body{background:#fff}.topbar,.noprint{display:none!important}.view{display:none!important}#printcard{display:block!important;text-align:center;color:#000;font-family:Rubik,Arial}}
+#printcard{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+ <div style="display:flex;align-items:center;gap:10px"><span class="logo-chip"><img src="technoda.png" alt="טכנודע"></span><span class="brand">🧱 מעבדת HTML</span></div>
+ <div class="tabs"><button class="tab on" data-v="learn">🧱 משימות HTML</button><button class="tab" data-v="studio">🛠️ הסטודיו</button><button class="tab" data-v="qr">📱 ברקוד לאתר</button></div>
+</div>
+<div class="wrap">
+ <!-- LEARN -->
+ <section class="view on" id="v-learn">
+  <div class="steps" id="steps"></div>
+  <div class="grid2">
+   <div class="card">
+    <h2 id="mTitle"></h2>
+    <div class="lead" id="mText"></div>
+    <textarea class="code" id="mCode" spellcheck="false"></textarea>
+    <div class="row"><button class="btn" id="mCheck">✅ בדיקה</button><button class="ghost" id="mReset">↩️ התחלה מחדש</button></div>
+    <div class="msg" id="mMsg"></div>
+   </div>
+   <div class="card"><h2>👀 ככה הדפדפן מציג את הקוד</h2><iframe id="mFrame" sandbox="allow-scripts allow-modals" title="תצוגה"></iframe>
+    <p class="hint">הדפדפן קורא את ה־HTML מלמעלה למטה ו"מצייר" את הדף. כל שינוי בקוד – מופיע כאן מיד.</p></div>
+  </div>
+ </section>
+ <!-- STUDIO -->
+ <section class="view" id="v-studio">
+  <div class="grid2">
+   <div class="card">
+    <h2>🛠️ הקוד של האתר שלי</h2>
+    <p class="lead">מדביקים כאן את הקוד ש־ChatGPT כתב לפי התוכנית שלכם – ורואים את האתר מימין. אפשר לתקן ישירות בקוד!</p>
+    <textarea class="code" id="sCode" spellcheck="false"></textarea>
+    <div class="row">
+     <button class="btn" id="sDownload">⬇️ שמירה כ־index.html</button>
+     <button class="ghost" id="sCopy">📋 העתקת הקוד</button>
+     <button class="ghost" id="sCheck">🕵️ בדיקת פרטיות</button>
+    </div>
+    <div class="msg" id="sMsg"></div>
+   </div>
+   <div class="card"><h2>🌐 האתר שלי</h2><iframe id="sFrame" sandbox="allow-scripts allow-modals" title="האתר שלי"></iframe>
+    <div id="sTags" class="hint"></div></div>
+  </div>
+ </section>
+ <!-- QR -->
+ <section class="view" id="v-qr">
+  <div class="grid2">
+   <div class="card noprint">
+    <h2>📱 ברקוד (QR) לאתר שלי</h2>
+    <p class="lead">אחרי שהעליתם את האתר לרשת וקיבלתם קישור – הדביקו אותו כאן. כל מי שיסרוק את הברקוד בטלפון יגיע לאתר שלכם!</p>
+    <label class="hint">הקישור לאתר:</label>
+    <input type="text" id="qUrl" placeholder="https://...">
+    <label class="hint" style="display:block;margin-top:8px">שם האתר (לכרטיס):</label>
+    <input type="text" id="qName" placeholder="האתר של…" style="direction:rtl">
+    <div class="row"><button class="btn" id="qMake">✨ צור ברקוד</button><button class="ghost" id="qDl">⬇️ הורדת הברקוד</button><button class="ghost" id="qPrint">🖨️ הדפסת כרטיס</button></div>
+    <div class="msg" id="qMsg"></div>
+   </div>
+   <div class="card qrcard"><h2 id="qTitle">הברקוד יופיע כאן</h2><div id="qr"></div><p class="hint" id="qShow" style="direction:ltr"></p></div>
+  </div>
+ </section>
+</div>
+<div id="printcard"><h1 id="pTitle"></h1><div id="pqr"></div><p>📱 סרקו אותי!</p><p id="pUrl" style="direction:ltr"></p></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const BASE=(body,style="")=>`<!doctype html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<title>האתר שלי</title>\n${style}</head>\n<body>\n${body}\n</body>\n</html>`;
+const MISSIONS=[
+ {t:"משימה 1 – כותרת ראשית <h1>",
+  x:"כל אתר מתחיל בכותרת. התגית <code>&lt;h1&gt;</code> פותחת כותרת ו־<code>&lt;/h1&gt;</code> סוגרת אותה. <b>שנו את הכותרת לשם האתר שלכם.</b>",
+  c:BASE("<h1>כותרת האתר</h1>"),ok:c=>/<h1>(?!\s*כותרת האתר\s*<)[\s\S]+?<\/h1>/i.test(c),hint:"כתבו בין <h1> ל-</h1> שם משלכם"},
+ {t:"משימה 2 – פסקה <p>",
+  x:"<code>&lt;p&gt;</code> היא פסקת טקסט. <b>הוסיפו מתחת לכותרת פסקה שמסבירה על מה האתר.</b>",
+  c:BASE("<h1>האתר שלי</h1>\n"),ok:c=>/<p>[\s\S]{3,}?<\/p>/i.test(c),hint:"הוסיפו <p>טקסט</p>"},
+ {t:"משימה 3 – רשימה <ul> <li>",
+  x:"<code>&lt;ul&gt;</code> היא רשימה, וכל פריט בתוכה הוא <code>&lt;li&gt;</code>. <b>צרו רשימה של 3 דברים שאתם אוהבים.</b>",
+  c:BASE("<h1>הדברים שאני אוהב/ת</h1>\n<ul>\n  <li>פיצה</li>\n</ul>"),ok:c=>(c.match(/<li>/gi)||[]).length>=3,hint:"צריך לפחות 3 <li>"},
+ {t:"משימה 4 – כפתור <button>",
+  x:"<code>&lt;button&gt;</code> יוצר כפתור. אפשר לשים בו אימוג׳י! <b>הוסיפו כפתור עם טקסט משלכם.</b>",
+  c:BASE("<h1>האתר שלי</h1>\n<p>לחצו על הכפתור:</p>\n"),ok:c=>/<button[^>]*>[\s\S]+?<\/button>/i.test(c),hint:"הוסיפו <button>👋 שלום</button>"},
+ {t:"משימה 5 – עיצוב עם CSS",
+  x:"CSS הוא \"הבגדים\" של האתר. בתוך <code>&lt;style&gt;</code> קובעים צבעים. <b>שנו את צבע הרקע (background) ואת צבע הכותרת (color).</b>",
+  c:BASE("<h1>האתר הצבעוני שלי</h1>\n<p>היי!</p>","<style>\n  body { background: white; font-family: Arial; }\n  h1 { color: black; }\n</style>\n"),
+  ok:c=>!/background:\s*white/i.test(c)&&!/h1\s*\{\s*color:\s*black/i.test(c)&&/<style>/i.test(c),hint:"החליפו white ו-black בצבעים אחרים, למשל lightblue ו-purple"},
+ {t:"משימה 6 – פעולה עם JavaScript",
+  x:"JavaScript הוא \"השרירים\": הוא גורם לדברים לקרות. <code>onclick</code> אומר מה קורה בלחיצה. <b>שנו את ההודעה שקופצת, ולחצו על הכפתור בתצוגה.</b>",
+  c:BASE("<h1>כפתור קסם</h1>\n<button onclick=\"alert('שלום עולם!')\">✨ לחצו עליי</button>"),ok:c=>/onclick=["']alert\(['"](?!שלום עולם!)[^'"]+['"]\)/i.test(c),hint:"שנו את הטקסט בתוך alert('...')"},
+];
+let mi=0;const done=new Set();
+function renderSteps(){$("#steps").innerHTML=MISSIONS.map((m,i)=>`<button class="st ${i===mi?"on":""} ${done.has(i)?"done":""}" data-i="${i}">${done.has(i)?"✓":i+1}</button>`).join("");$$(".st").forEach(b=>b.onclick=()=>{mi=+b.dataset.i;load()})}
+function load(){const m=MISSIONS[mi];$("#mTitle").textContent=m.t;$("#mText").innerHTML=m.x;$("#mCode").value=m.c;$("#mMsg").textContent="";preview();renderSteps()}
+function preview(){$("#mFrame").srcdoc=$("#mCode").value}
+$("#mCode").addEventListener("input",preview);
+$("#mCode").addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const t=e.target,s=t.selectionStart;t.value=t.value.slice(0,s)+"  "+t.value.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=s+2}});
+$("#mCheck").onclick=()=>{const m=MISSIONS[mi],c=$("#mCode").value;
+ if(m.ok(c)){done.add(mi);$("#mMsg").textContent=mi<MISSIONS.length-1?"🎉 מעולה! עוברים למשימה הבאה…":"🏆 סיימתם את כל המשימות – אתם מבינים HTML, CSS ו־JS! עברו לסטודיו.";$("#mMsg").className="msg good";
+  renderSteps();if(mi<MISSIONS.length-1)setTimeout(()=>{mi++;load()},1300)}
+ else{$("#mMsg").textContent="🤔 עוד לא – "+m.hint;$("#mMsg").className="msg bad"}};
+$("#mReset").onclick=load;
+
+// studio
+const STARTER=BASE("<h1>🚀 האתר שלי</h1>\n<p>כאן יופיע האתר שתבנו עם ChatGPT.</p>","<style>\n  body{font-family:Arial;background:#f0f4ff;text-align:center;padding:30px}\n  h1{color:#5b2be0}\n</style>\n");
+$("#sCode").value=STARTER;
+function sPrev(){const c=$("#sCode").value;$("#sFrame").srcdoc=c;
+ const tags=[...new Set((c.match(/<([a-z][a-z0-9]*)\b/gi)||[]).map(t=>t.slice(1).toLowerCase()))].filter(t=>!["html","head","meta","title","body","br"].includes(t));
+ $("#sTags").innerHTML="🔎 תגיות באתר שלכם: "+tags.map(t=>`<span class="tag">&lt;${t}&gt;</span>`).join("")}
+$("#sCode").addEventListener("input",sPrev);sPrev();
+function cleanPaste(t){const m=t.match(/```(?:html)?\s*([\s\S]*?)```/i);return m?m[1].trim():t}
+$("#sCode").addEventListener("paste",()=>setTimeout(()=>{$("#sCode").value=cleanPaste($("#sCode").value);sPrev()},0));
+$("#sDownload").onclick=()=>{const a=document.createElement("a");a.download="index.html";a.href=URL.createObjectURL(new Blob([$("#sCode").value],{type:"text/html"}));a.click();
+ $("#sMsg").textContent="💾 נשמר כ־index.html – העבירו אותו לתיקייה האישית שלכם.";$("#sMsg").className="msg good"};
+$("#sCopy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($("#sCode").value);$("#sMsg").textContent="📋 הקוד הועתק";$("#sMsg").className="msg good"};
+$("#sCheck").onclick=()=>{const c=$("#sCode").value,found=[];
+ if(/\b0\d{1,2}[-\s]?\d{7}\b|\b05\d[-\s]?\d{3}[-\s]?\d{4}\b/.test(c))found.push("מספר טלפון");
+ if(/[\w.+-]+@[\w-]+\.[\w.]+/.test(c))found.push("כתובת מייל");
+ if(/רחוב|רח'|כתובת:|ת\.ז|תעודת זהות/.test(c))found.push("כתובת מגורים / ת״ז");
+ if(found.length){$("#sMsg").textContent="⚠️ נמצא באתר: "+found.join(", ")+" – מחקו לפני שמעלים לרשת! כל מי שיש לו את הקישור יראה את זה.";$("#sMsg").className="msg bad"}
+ else{$("#sMsg").textContent="✅ לא נמצאו פרטים אישיים בולטים. בדקו בעיניים גם שמות משפחה ותמונות.";$("#sMsg").className="msg good"}};
+
+// QR
+let qrObj=null;
+$("#qMake").onclick=()=>{let u=$("#qUrl").value.trim();if(!/^https?:\/\//i.test(u)){$("#qMsg").textContent="הקישור צריך להתחיל ב־https://";$("#qMsg").className="msg bad";return}
+ $("#qr").innerHTML="";qrObj=new QRCode($("#qr"),{text:u,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});
+ $("#qTitle").textContent=$("#qName").value.trim()||"האתר שלי";$("#qShow").textContent=u;$("#qMsg").textContent="✨ מוכן! סרקו עם המצלמה של הטלפון.";$("#qMsg").className="msg good"};
+$("#qDl").onclick=()=>{const img=$("#qr img")||$("#qr canvas");if(!img)return;const a=document.createElement("a");a.download="my_site_qr.png";a.href=img.src||img.toDataURL();a.click()};
+$("#qPrint").onclick=()=>{if(!$("#qr").innerHTML)return;$("#pTitle").textContent=$("#qTitle").textContent;$("#pUrl").textContent=$("#qShow").textContent;$("#pqr").innerHTML="";new QRCode($("#pqr"),{text:$("#qShow").textContent,width:300,height:300});setTimeout(()=>window.print(),300)};
+
+$$(".tab").forEach(t=>t.onclick=()=>{$$(".tab").forEach(x=>x.classList.toggle("on",x===t));$$(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+t.dataset.v))});
+load();
+</script>
+</body>
+</html>
